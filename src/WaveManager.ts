@@ -1,19 +1,26 @@
-import Enemy from "./Enemy.js";
+import Game from "./Game";
+import { WaveConfig, EnemyType } from "./types";
 
 export default class WaveManager {
-  constructor(game) {
-    this.game = game; // Reference to Game to add enemies
-    this.waves = [];
+  game: Game;
+  waves: WaveConfig[];
+  currentWaveIndex: number;
+  waveActive: boolean;
+  spawnQueue: EnemyType[];
+  spawnTimer: number;
+  spawnInterval: number;
 
+  constructor(game: Game) {
+    this.game = game;
+    this.waves = [];
     this.currentWaveIndex = -1;
     this.waveActive = false;
-
     this.spawnQueue = [];
     this.spawnTimer = 0;
     this.spawnInterval = 0;
   }
 
-  init(wavesConfig) {
+  init(wavesConfig: WaveConfig[]) {
     this.waves = wavesConfig;
     this.currentWaveIndex = -1;
     this.spawnQueue = [];
@@ -35,8 +42,8 @@ export default class WaveManager {
       this.spawnQueue.push(wave.type);
     }
 
-    this.spawnInterval = wave.interval / 1000; // Convert ms to seconds
-    this.spawnTimer = 0; // Spawn first enemy immediately
+    this.spawnInterval = wave.interval / 1000;
+    this.spawnTimer = 0;
     this.waveActive = true;
 
     console.log(`Starting Wave ${this.currentWaveIndex + 1}:`, wave);
@@ -47,24 +54,22 @@ export default class WaveManager {
     };
   }
 
-  update(deltaTime) {
+  update(deltaTime: number) {
     if (!this.waveActive) return;
 
     if (this.spawnQueue.length > 0) {
       this.spawnTimer -= deltaTime;
       if (this.spawnTimer <= 0) {
         const type = this.spawnQueue.shift();
-        this.game.spawnEnemy(type);
-        this.spawnTimer = this.spawnInterval;
+        if (type) {
+          this.game.spawnEnemy(type);
+          this.spawnTimer = this.spawnInterval;
+        }
       }
-    } else {
-      // Queue empty, we can stop "spawning activity" logic if we want,
-      // but for now we just keep waveActive true until manually reset or handled.
-      // Actually, let's leave it.
     }
   }
 
-  isSpawning() {
+  isSpawning(): boolean {
     return this.spawnQueue.length > 0;
   }
 }

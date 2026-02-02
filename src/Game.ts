@@ -1,33 +1,46 @@
-import UI from "./UI.js";
-import WaveManager from "./WaveManager.js";
-import Tower from "./Tower.js";
-import GameMap from "./Map.js";
-import Level1 from "./levels/level1.js";
-import Level2 from "./levels/level2.js";
-import Enemy from "./Enemy.js";
+import UI from "./UI";
+import WaveManager from "./WaveManager";
+import Tower from "./Tower";
+import GameMap from "./Map";
+import Level1 from "./levels/level1"; // We need to update levels too
+import Level2 from "./levels/level2";
+import Enemy from "./Enemy";
+import { LevelData, PathNode, EnemyType } from "./types";
 
 export default class Game {
+  ui: UI;
+  waveManager: WaveManager;
+  tower: Tower;
+  map: GameMap | null;
+
+  enemies: Enemy[];
+  currentPath: PathNode[];
+  playerHealth: number;
+  waveInProgress: boolean;
+
+  lastTime: number;
+  isPlaying: boolean;
+
+  canvas: HTMLCanvasElement | null;
+  ctx: CanvasRenderingContext2D | null;
+
   constructor() {
     this.ui = new UI();
     this.waveManager = new WaveManager(this);
     this.tower = new Tower();
     this.map = null;
 
-    // Game State
     this.enemies = [];
     this.currentPath = [];
     this.playerHealth = 10;
-    this.waveInProgress = false; // Add flag to track total wave state
+    this.waveInProgress = false;
 
-    // Loop controls
     this.lastTime = 0;
     this.isPlaying = false;
 
-    // Canvas for rendering entities
     this.canvas = null;
     this.ctx = null;
 
-    // Bind loop
     this.gameLoop = this.gameLoop.bind(this);
 
     this.init();
@@ -44,16 +57,14 @@ export default class Game {
     requestAnimationFrame(this.gameLoop);
   }
 
-  startGame(levelData, title) {
+  startGame(levelData: LevelData, title: string) {
     console.log(`Starting ${title}`);
 
-    // Reset State
     this.playerHealth = levelData.startHealth || 10;
     this.ui.updateHealth(this.playerHealth);
     this.waveInProgress = false;
     this.ui.toggleWaveButton(true);
 
-    // Load Level Data
     this.map = new GameMap(levelData.map);
     this.currentPath = this.map.findPath();
 
@@ -65,10 +76,8 @@ export default class Game {
     this.enemies = [];
     this.isPlaying = true;
 
-    // UI Updates
     this.ui.showGameScreen(title);
 
-    // Render Map
     const mapContainer = document.getElementById("map-container");
     if (mapContainer) {
       this.map.render(mapContainer);
@@ -78,7 +87,7 @@ export default class Game {
     this.ui.updateWaveStatus(0, levelData.waves.length);
   }
 
-  setupCanvas(container) {
+  setupCanvas(container: HTMLElement) {
     const oldCanvas = container.querySelector("canvas");
     if (oldCanvas) oldCanvas.remove();
 
@@ -109,7 +118,6 @@ export default class Game {
   startWave() {
     if (this.playerHealth <= 0) return;
 
-    // Check if a wave is already running
     if (this.waveInProgress) {
       console.log("Wave in progress, cannot start new one.");
       return;
@@ -118,13 +126,12 @@ export default class Game {
     const status = this.waveManager.startNextWave();
     if (status && status.current) {
       this.ui.updateWaveStatus(status.current, status.total);
-
       this.waveInProgress = true;
-      this.ui.toggleWaveButton(false); // Disable button
+      this.ui.toggleWaveButton(false);
     }
   }
 
-  spawnEnemy(type) {
+  spawnEnemy(type: EnemyType) {
     if (!this.currentPath || this.currentPath.length === 0) return;
     const enemy = new Enemy(type, this.currentPath);
     this.enemies.push(enemy);
@@ -134,7 +141,7 @@ export default class Game {
     this.tower.create();
   }
 
-  gameLoop(timestamp) {
+  gameLoop(timestamp: number) {
     const deltaTime = (timestamp - this.lastTime) / 1000;
     this.lastTime = timestamp;
 
@@ -146,12 +153,11 @@ export default class Game {
     requestAnimationFrame(this.gameLoop);
   }
 
-  update(deltaTime) {
+  update(deltaTime: number) {
     if (this.playerHealth <= 0) return;
 
     this.waveManager.update(deltaTime);
 
-    // Update enemies
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const enemy = this.enemies[i];
       enemy.update(deltaTime);
@@ -165,18 +171,16 @@ export default class Game {
       }
     }
 
-    // Check end of wave
     if (this.waveInProgress) {
-      // Wave ends when no enemies are spawning AND no enemies are alive
       if (!this.waveManager.isSpawning() && this.enemies.length === 0) {
         console.log("Wave Finished!");
         this.waveInProgress = false;
-        this.ui.toggleWaveButton(true); // Re-enable button
+        this.ui.toggleWaveButton(true);
       }
     }
   }
 
-  takeDamage(amount) {
+  takeDamage(amount: number) {
     this.playerHealth -= amount;
     if (this.playerHealth < 0) this.playerHealth = 0;
 
@@ -186,19 +190,19 @@ export default class Game {
       console.log("GAME OVER");
       this.ui.updateHealth("GAME OVER");
       this.isPlaying = false;
-      // Also ensure/disable things if needed
       this.ui.toggleWaveButton(false);
     }
   }
 
   render() {
-    if (!this.ctx || !this.map) return;
+    if (!this.ctx || !this.map || !this.canvas) return;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const tileSize = this.canvas.width / this.map.cols;
 
     this.enemies.forEach((enemy) => {
+      if (!this.ctx) return;
       const cx = enemy.x * tileSize;
       const cy = enemy.y * tileSize;
       const radius = enemy.radius * tileSize;

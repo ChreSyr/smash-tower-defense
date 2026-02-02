@@ -1,4 +1,5 @@
-import { TILE_TYPE as T, ENEMY_TYPE as E } from "../constants.js";
+import { TileType as T, EnemyType as E } from "../types";
+import { LevelData } from "../types";
 
 const map = [
   [
@@ -128,8 +129,10 @@ const waves = [
   { count: 1, interval: 2000, type: E.BOSS },
 ];
 
-export default {
+const data: LevelData = {
   map,
   waves,
-  startHealth: 20, // Level 2 gives more health
+  startHealth: 20,
 };
+
+export default data;

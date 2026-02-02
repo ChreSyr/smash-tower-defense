@@ -1,24 +1,26 @@
-import { TILE_TYPE } from "./constants.js";
+import { TileType, PathNode } from "./types";
 
 export default class GameMap {
-  constructor(levelData) {
+  grid: TileType[][];
+  rows: number;
+  cols: number;
+  tileSize: number;
+
+  constructor(levelData: TileType[][]) {
     this.grid = levelData;
     this.rows = levelData.length;
     this.cols = levelData[0].length;
-    this.tileSize = 0; // Calculated on render
+    this.tileSize = 0;
   }
 
-  render(containerElement) {
+  render(containerElement: HTMLElement) {
     containerElement.innerHTML = "";
     containerElement.className = "game-map";
 
-    // Dynamic grid styling
     containerElement.style.display = "grid";
     containerElement.style.gridTemplateColumns = `repeat(${this.cols}, 1fr)`;
     containerElement.style.gridTemplateRows = `repeat(${this.rows}, 1fr)`;
 
-    // Get approximate tile size for canvas drawing later
-    // Assuming square map container for now
     const rect = containerElement.getBoundingClientRect();
     this.tileSize = rect.width / this.cols;
 
@@ -27,64 +29,64 @@ export default class GameMap {
         const tileType = this.grid[r][c];
         const tile = document.createElement("div");
         tile.className = `tile ${this.getTileClass(tileType)}`;
-        tile.dataset.row = r;
-        tile.dataset.col = c;
+        tile.dataset.row = r.toString();
+        tile.dataset.col = c.toString();
         containerElement.appendChild(tile);
       }
     }
   }
 
-  getTileClass(type) {
+  getTileClass(type: TileType): string {
     switch (type) {
-      case TILE_TYPE.BUILDABLE:
+      case TileType.BUILDABLE:
         return "tile-buildable";
-      case TILE_TYPE.PATH:
+      case TileType.PATH:
         return "tile-path";
-      case TILE_TYPE.OBSTACLE:
+      case TileType.OBSTACLE:
         return "tile-obstacle";
-      case TILE_TYPE.START:
+      case TileType.START:
         return "tile-start";
-      case TILE_TYPE.END:
+      case TileType.END:
         return "tile-end";
       default:
         return "tile-empty";
     }
   }
 
-  // A simple BFS to find path from Start to End
-  findPath() {
-    let startNode = null;
-    let endNode = null;
+  findPath(): PathNode[] {
+    let startNode: PathNode | null = null;
+    let endNode: PathNode | null = null;
 
-    // Find start and end
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
-        if (this.grid[r][c] === TILE_TYPE.START) startNode = { r, c };
-        if (this.grid[r][c] === TILE_TYPE.END) endNode = { r, c };
+        if (this.grid[r][c] === TileType.START) startNode = { row: r, col: c };
+        if (this.grid[r][c] === TileType.END) endNode = { row: r, col: c };
       }
     }
 
     if (!startNode || !endNode) return [];
 
-    const queue = [{ r: startNode.r, c: startNode.c, path: [] }];
-    const visited = new Set();
-    visited.add(`${startNode.r},${startNode.c}`);
+    const queue: { r: number; c: number; path: PathNode[] }[] = [
+      { r: startNode.row, c: startNode.col, path: [] },
+    ];
+    const visited = new Set<string>();
+    visited.add(`${startNode.row},${startNode.col}`);
 
     const directions = [
-      { dr: -1, dc: 0 }, // Up
-      { dr: 1, dc: 0 }, // Down
-      { dr: 0, dc: -1 }, // Left
-      { dr: 0, dc: 1 }, // Right
+      { dr: -1, dc: 0 },
+      { dr: 1, dc: 0 },
+      { dr: 0, dc: -1 },
+      { dr: 0, dc: 1 },
     ];
 
     while (queue.length > 0) {
       const current = queue.shift();
+      if (!current) break;
       const { r, c, path } = current;
 
-      // Include current node in path
       const newPath = [...path, { row: r, col: c }];
 
-      if (r === endNode.r && c === endNode.c) {
+      if (r === endNode.row && c === endNode.col) {
         return newPath;
       }
 
@@ -94,13 +96,10 @@ export default class GameMap {
 
         if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols) {
           const tile = this.grid[nr][nc];
-          // Valid tiles to walk on: Path, End, Start (if we consider backtracking allowed, but usually map design prevents loops)
-          // Actually, Start is only valid as a starting point.
-          // We treat Path and End as walkable.
           if (
-            (tile === TILE_TYPE.PATH ||
-              tile === TILE_TYPE.END ||
-              tile === TILE_TYPE.START) &&
+            (tile === TileType.PATH ||
+              tile === TileType.END ||
+              tile === TileType.START) &&
             !visited.has(`${nr},${nc}`)
           ) {
             visited.add(`${nr},${nc}`);

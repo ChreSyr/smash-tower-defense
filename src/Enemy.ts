@@ -1,33 +1,48 @@
-import { ENEMY_CONFIG } from "./constants.js";
+import { ENEMY_CONFIG } from "./constants";
+import { EnemyType, EnemyConfig, PathNode, Point } from "./types";
 
 export default class Enemy {
-  constructor(type, path) {
-    this.type = type;
-    this.config = ENEMY_CONFIG[type] || ENEMY_CONFIG["basic"];
+  type: EnemyType;
+  config: EnemyConfig;
+  path: PathNode[];
+  pathIndex: number;
+  x: number;
+  y: number;
+  target: Point | null;
+  alive: boolean;
+  reachedEnd: boolean;
 
-    this.path = path; // Array of {col, row} points
+  // Derived properties for easy access
+  health: number;
+  speed: number;
+  color: string;
+  radius: number;
+
+  constructor(type: EnemyType, path: PathNode[]) {
+    this.type = type;
+    this.config = ENEMY_CONFIG[type] || ENEMY_CONFIG[EnemyType.BASIC];
+
+    this.path = path;
     this.pathIndex = 0;
 
-    // Start at middle of first tile
     if (path.length > 0) {
-      this.x = path[0].col + 0.5; // Center of tile
-      this.y = path[0].row + 0.5; // Center of tile
+      this.x = path[0].col + 0.5;
+      this.y = path[0].row + 0.5;
     } else {
-      // Error case
       this.x = 0;
       this.y = 0;
     }
 
     this.target = null;
+    this.alive = true;
+    this.reachedEnd = false;
+
     this.updateTarget();
 
     this.health = this.config.health;
     this.speed = this.config.speed;
     this.color = this.config.color;
     this.radius = this.config.radius;
-
-    this.alive = true;
-    this.reachedEnd = false;
   }
 
   updateTarget() {
@@ -44,24 +59,20 @@ export default class Enemy {
     }
   }
 
-  update(deltaTime) {
+  update(deltaTime: number) {
     if (!this.alive || !this.target) return;
 
-    // Move towards target
     const dx = this.target.x - this.x;
     const dy = this.target.y - this.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Speed in tiles per second * delta time (seconds)
     const moveStep = this.speed * deltaTime;
 
     if (distance <= moveStep) {
-      // Reached target (snap to it)
       this.x = this.target.x;
       this.y = this.target.y;
       this.updateTarget();
     } else {
-      // Move partially
       this.x += (dx / distance) * moveStep;
       this.y += (dy / distance) * moveStep;
     }
