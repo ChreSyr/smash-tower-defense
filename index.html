@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smash Tower Defense</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Home Screen -->
+      <section id="home-screen">
+        <h1>Smash Tower Defense</h1>
+        <div class="level-select">
+          <button id="play-btn-1" class="btn primary-btn">Play Level 1</button>
+          <button id="play-btn-2" class="btn primary-btn">Play Level 2</button>
+        </div>
+      </section>
+
+      <!-- Game Screen -->
+      <section id="game-screen" class="hidden">
+        <header class="game-header">
+          <button id="home-btn" class="btn secondary-btn">Back Home</button>
+          <h2>Game</h2>
+          <div id="wave-menu">
+            <button id="start-wave-btn" class="btn">Start Enemy Wave</button>
+            <span
+              id="health-display"
+              style="margin-right: 15px; color: #e74c3c; font-weight: bold"
+              >Health: --</span
+            >
+            <span id="wave-status">Wave: 0</span>
+          </div>
+        </header>
+
+        <div id="game-area">
+          <div id="map-container"></div>
+
+          <div class="controls">
+            <button id="tower-btn" class="btn secondary-btn">
+              Create Basic Tower
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

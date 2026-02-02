@@ -1,0 +1,197 @@
+:root {
+  --primary-color: #3498db;
+  --secondary-color: #2ecc71;
+  --bg-color: #f4f4f4;
+  --text-color: #333;
+  --danger-color: #e74c3c;
+
+  /* Map Colors */
+  --tile-buildable: #27ae60; /* Grass */
+  --tile-path: #f1c40f; /* Dirt Path */
+  --tile-obstacle: #7f8c8d; /* Rock/Wall */
+  --tile-start: #3498db; /* Start */
+  --tile-end: #c0392b; /* End */
+  --tile-border: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#app {
+  width: 100%;
+  max-width: 1200px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Screens */
+section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Home Screen */
+#home-screen h1 {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+/* Game Screen */
+#game-screen {
+  justify-content: flex-start;
+}
+
+.game-header {
+  width: 100%;
+  padding: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+}
+
+#game-area {
+  flex: 1;
+  width: 100%;
+  background-color: #ecf0f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden; /* Keep map inside */
+}
+
+/* Map Styling */
+.game-map {
+  width: 90vmin; /* Responsive square-ish */
+  height: 90vmin;
+  background: #000;
+  gap: 1px; /* Grid lines */
+  border: 5px solid #bdc3c7;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 0.8rem;
+  color: white;
+  font-weight: bold;
+  transition: filter 0.2s;
+}
+
+.tile:hover {
+  filter: brightness(110%);
+}
+
+.tile-buildable {
+  background-color: var(--tile-buildable);
+}
+
+.tile-path {
+  background-color: var(--tile-path);
+}
+
+.tile-obstacle {
+  background-color: var(--tile-obstacle);
+}
+
+.tile-start {
+  background-color: var(--tile-start);
+  position: relative;
+}
+
+.tile-start::after {
+  content: "S";
+}
+
+.tile-end {
+  background-color: var(--tile-end);
+  position: relative;
+}
+
+.tile-end::after {
+  content: "E";
+}
+
+.controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+.primary-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.primary-btn:hover {
+  background-color: #2980b9;
+}
+
+.secondary-btn {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.secondary-btn:hover {
+  background-color: #27ae60;
+}
+
+/* Canvas Overlay */
+#map-container {
+  position: relative;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
