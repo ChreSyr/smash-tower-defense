@@ -6,11 +6,11 @@
   --danger-color: #e74c3c;
 
   /* Map Colors */
-  --tile-buildable: #27ae60; /* Grass */
-  --tile-path: #f1c40f; /* Dirt Path */
-  --tile-obstacle: #7f8c8d; /* Rock/Wall */
-  --tile-start: #3498db; /* Start */
-  --tile-end: #c0392b; /* End */
+  --tile-buildable: #27ae60;
+  --tile-path: #f1c40f;
+  --tile-obstacle: #7f8c8d;
+  --tile-start: #3498db;
+  --tile-end: #c0392b;
   --tile-border: rgba(0, 0, 0, 0.1);
 }
 
@@ -33,7 +33,6 @@ body {
 
 #app {
   width: 100%;
-  max-width: 1200px;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -47,8 +46,6 @@ section {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .hidden {
@@ -56,6 +53,11 @@ section {
 }
 
 /* Home Screen */
+#home-screen {
+  justify-content: center;
+  align-items: center;
+}
+
 #home-screen h1 {
   font-size: 3rem;
   margin-bottom: 2rem;
@@ -69,13 +71,15 @@ section {
 
 .game-header {
   width: 100%;
-  padding: 1rem;
+  height: 60px;
+  padding: 0 1rem;
   background: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 #game-area {
@@ -83,19 +87,30 @@ section {
   width: 100%;
   background-color: #ecf0f1;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  overflow: hidden; /* Keep map inside */
+  flex-direction: row; /* Horizontal layout */
+  overflow: hidden;
 }
 
 /* Map Styling */
+#map-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: #333;
+  position: relative;
+  overflow: hidden;
+}
+
 .game-map {
-  width: 90vmin; /* Responsive square-ish */
-  height: 90vmin;
+  /* JS will control width/height to ensure squareness */
+  /* We just center it */
+  margin: auto;
+  position: relative; /* For absolute canvas positioning inside */
+
   background: #000;
-  gap: 1px; /* Grid lines */
+  gap: 1px;
   border: 5px solid #bdc3c7;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
@@ -119,46 +134,54 @@ section {
 .tile-buildable {
   background-color: var(--tile-buildable);
 }
-
 .tile-path {
   background-color: var(--tile-path);
 }
-
 .tile-obstacle {
   background-color: var(--tile-obstacle);
 }
-
 .tile-start {
   background-color: var(--tile-start);
-  position: relative;
+}
+.tile-end {
+  background-color: var(--tile-end);
 }
 
 .tile-start::after {
   content: "S";
 }
-
-.tile-end {
-  background-color: var(--tile-end);
-  position: relative;
-}
-
 .tile-end::after {
   content: "E";
 }
 
+/* Controls Sidebar */
 .controls {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 250px;
+  background: #fff;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+  z-index: 5;
+}
+
+.tower-btn {
+  /* Style updates are in html head currently, but good to have here too */
+  width: 100%;
+  margin-bottom: 10px;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px 20px;
+  height: auto;
+}
+.tower-btn span {
+  pointer-events: none;
 }
 
 /* Buttons */
 .btn {
-  padding: 10px 20px;
+  padding: 8px 16px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -170,7 +193,6 @@ section {
   background-color: var(--primary-color);
   color: white;
 }
-
 .primary-btn:hover {
   background-color: #2980b9;
 }
@@ -179,19 +201,6 @@ section {
   background-color: var(--secondary-color);
   color: white;
 }
-
 .secondary-btn:hover {
   background-color: #27ae60;
-}
-
-/* Canvas Overlay */
-#map-container {
-  position: relative;
-}
-
-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
 }

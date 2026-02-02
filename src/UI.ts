@@ -7,10 +7,17 @@ export default class UI {
   homeBtn: HTMLElement | null;
 
   startWaveBtn: HTMLButtonElement;
-  towerBtn: HTMLElement;
+
+  // Info Displays
   waveStatus: HTMLElement;
   healthDisplay: HTMLElement;
+  moneyDisplay: HTMLElement;
   levelTitle: HTMLElement;
+
+  // Tower Buttons
+  btnTowerBasic: HTMLElement;
+  btnTowerSniper: HTMLElement;
+  btnTowerRapid: HTMLElement;
 
   constructor() {
     this.homeScreen = document.getElementById("home-screen")!;
@@ -23,10 +30,15 @@ export default class UI {
     this.startWaveBtn = document.getElementById(
       "start-wave-btn",
     ) as HTMLButtonElement;
-    this.towerBtn = document.getElementById("tower-btn")!;
+
     this.waveStatus = document.getElementById("wave-status")!;
     this.healthDisplay = document.getElementById("health-display")!;
+    this.moneyDisplay = document.getElementById("money-display")!;
     this.levelTitle = document.querySelector("#game-screen h2") as HTMLElement;
+
+    this.btnTowerBasic = document.getElementById("btn-tower-basic")!;
+    this.btnTowerSniper = document.getElementById("btn-tower-sniper")!;
+    this.btnTowerRapid = document.getElementById("btn-tower-rapid")!;
   }
 
   showGameScreen(levelName: string) {
@@ -51,6 +63,10 @@ export default class UI {
     }
   }
 
+  updateMoney(amount: number) {
+    this.moneyDisplay.textContent = `💰 ${amount}`;
+  }
+
   toggleWaveButton(enable: boolean) {
     if (enable) {
       this.startWaveBtn.disabled = false;
@@ -65,6 +81,7 @@ export default class UI {
     }
   }
 
+  // Event listener helpers
   onPlayLevel1(callback: () => void) {
     this.playBtn1.addEventListener("click", callback);
   }
@@ -81,7 +98,9 @@ export default class UI {
     this.startWaveBtn.addEventListener("click", callback);
   }
 
-  onTowerCreate(callback: () => void) {
-    this.towerBtn.addEventListener("click", callback);
+  onTowerSelect(callback: (type: string) => void) {
+    this.btnTowerBasic.addEventListener("click", () => callback("basic"));
+    this.btnTowerSniper.addEventListener("click", () => callback("sniper"));
+    this.btnTowerRapid.addEventListener("click", () => callback("rapid"));
   }
 }

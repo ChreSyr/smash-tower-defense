@@ -15,12 +15,28 @@ export enum EnemyType {
   SWARM = "swarm",
 }
 
+export enum TowerType {
+  BASIC = "basic",
+  SNIPER = "sniper",
+  RAPID = "rapid",
+}
+
 export interface EnemyConfig {
   speed: number;
   health: number;
   color: string;
   radius: number;
   damage: number;
+  killValue: number;
+}
+
+export interface TowerConfig {
+  name: string;
+  cost: number;
+  range: number;
+  damage: number;
+  fireRate: number; // Shots per second
+  color: string;
 }
 
 export interface WaveConfig {
@@ -33,6 +49,7 @@ export interface LevelData {
   map: TileType[][];
   waves: WaveConfig[];
   startHealth: number;
+  startMoney: number;
 }
 
 export interface Point {

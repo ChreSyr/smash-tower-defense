@@ -2,10 +2,11 @@ import UI from "./UI";
 import WaveManager from "./WaveManager";
 import Tower from "./Tower";
 import GameMap from "./Map";
-import Level1 from "./levels/level1"; // We need to update levels too
+import Level1 from "./levels/level1";
 import Level2 from "./levels/level2";
 import Enemy from "./Enemy";
-import { LevelData, PathNode, EnemyType } from "./types";
+import { LevelData, PathNode, EnemyType, TowerType } from "./types";
+import { TOWER_CONFIG } from "./constants";
 
 export default class Game {
   ui: UI;
@@ -16,7 +17,9 @@ export default class Game {
   enemies: Enemy[];
   currentPath: PathNode[];
   playerHealth: number;
+  money: number;
   waveInProgress: boolean;
+  waveEnemiesKilledValue: number; // To track value for wave end bonus
 
   lastTime: number;
   isPlaying: boolean;
@@ -33,7 +36,9 @@ export default class Game {
     this.enemies = [];
     this.currentPath = [];
     this.playerHealth = 10;
+    this.money = 0;
     this.waveInProgress = false;
+    this.waveEnemiesKilledValue = 0;
 
     this.lastTime = 0;
     this.isPlaying = false;
@@ -52,7 +57,11 @@ export default class Game {
     this.ui.onHome(() => this.goHome());
 
     this.ui.onStartWave(() => this.startWave());
-    this.ui.onTowerCreate(() => this.createTower());
+
+    // Handle Tower Selection
+    this.ui.onTowerSelect((type: string) => {
+      this.handleTowerSelect(type);
+    });
 
     requestAnimationFrame(this.gameLoop);
   }
@@ -61,8 +70,12 @@ export default class Game {
     console.log(`Starting ${title}`);
 
     this.playerHealth = levelData.startHealth || 10;
+    this.money = levelData.startMoney || 100;
     this.ui.updateHealth(this.playerHealth);
+    this.ui.updateMoney(this.money);
+
     this.waveInProgress = false;
+    this.waveEnemiesKilledValue = 0;
     this.ui.toggleWaveButton(true);
 
     this.map = new GameMap(levelData.map);
@@ -79,12 +92,39 @@ export default class Game {
     this.ui.showGameScreen(title);
 
     const mapContainer = document.getElementById("map-container");
-    if (mapContainer) {
-      this.map.render(mapContainer);
-      this.setupCanvas(mapContainer);
+    if (mapContainer && this.map) {
+      // Create grid and get reference
+      const gridElement = this.map.render(mapContainer);
+
+      // Setup Canvas INSIDE the grid (so it overlays perfectly)
+      this.setupCanvas(gridElement);
+
+      // Setup Resizing Logic
+      this.handleResize(mapContainer, gridElement, this.canvas!);
+
+      // Keep reference for cleanup if needed, but usually one game instance per page load
+      window.addEventListener("resize", () =>
+        this.handleResize(mapContainer, gridElement, this.canvas!),
+      );
     }
 
     this.ui.updateWaveStatus(0, levelData.waves.length);
+  }
+
+  handleResize(
+    container: HTMLElement,
+    grid: HTMLElement,
+    canvas: HTMLCanvasElement,
+  ) {
+    const rect = container.getBoundingClientRect();
+    // Calculate max square size that fits with some padding
+    const size = Math.min(rect.width, rect.height) - 20;
+
+    grid.style.width = `${size}px`;
+    grid.style.height = `${size}px`;
+
+    canvas.width = size;
+    canvas.height = size;
   }
 
   setupCanvas(container: HTMLElement) {
@@ -94,16 +134,13 @@ export default class Game {
     this.canvas = document.createElement("canvas");
     this.canvas.className = "game-canvas";
 
-    const rect = container.getBoundingClientRect();
-    this.canvas.width = rect.width;
-    this.canvas.height = rect.height;
-
+    // CSS size matches parent (grid)
+    this.canvas.style.width = "100%";
+    this.canvas.style.height = "100%";
     this.canvas.style.position = "absolute";
     this.canvas.style.top = "0";
     this.canvas.style.left = "0";
     this.canvas.style.pointerEvents = "none";
-    this.canvas.style.width = "100%";
-    this.canvas.style.height = "100%";
 
     container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
@@ -119,7 +156,6 @@ export default class Game {
     if (this.playerHealth <= 0) return;
 
     if (this.waveInProgress) {
-      console.log("Wave in progress, cannot start new one.");
       return;
     }
 
@@ -127,7 +163,23 @@ export default class Game {
     if (status && status.current) {
       this.ui.updateWaveStatus(status.current, status.total);
       this.waveInProgress = true;
+      this.waveEnemiesKilledValue = 0; // Reset for new wave
       this.ui.toggleWaveButton(false);
+    }
+  }
+
+  handleTowerSelect(typeStr: string) {
+    // Just logic stub for now
+    let type = TowerType.BASIC;
+    if (typeStr === "sniper") type = TowerType.SNIPER;
+    if (typeStr === "rapid") type = TowerType.RAPID;
+
+    const config = TOWER_CONFIG[type];
+    if (this.money >= config.cost) {
+      console.log(`Selected ${config.name} tower. Cost: ${config.cost}`);
+      // In future: set placement mode
+    } else {
+      console.log("Not enough money!");
     }
   }
 
@@ -135,10 +187,6 @@ export default class Game {
     if (!this.currentPath || this.currentPath.length === 0) return;
     const enemy = new Enemy(type, this.currentPath);
     this.enemies.push(enemy);
-  }
-
-  createTower() {
-    this.tower.create();
   }
 
   gameLoop(timestamp: number) {
@@ -165,19 +213,43 @@ export default class Game {
       if (!enemy.alive) {
         this.enemies.splice(i, 1);
 
+        // Handle Enemy Death/End
         if (enemy.reachedEnd) {
           this.takeDamage(enemy.config.damage || 1);
+        } else {
+          // Enemy Killed
+          this.handleEnemyKill(enemy);
         }
       }
     }
 
     if (this.waveInProgress) {
       if (!this.waveManager.isSpawning() && this.enemies.length === 0) {
-        console.log("Wave Finished!");
-        this.waveInProgress = false;
-        this.ui.toggleWaveButton(true);
+        this.endWave();
       }
     }
+  }
+
+  handleEnemyKill(enemy: Enemy) {
+    const value = enemy.config.killValue || 0;
+    this.money += value;
+    this.waveEnemiesKilledValue += value;
+    this.ui.updateMoney(this.money);
+  }
+
+  endWave() {
+    console.log("Wave Finished!");
+    this.waveInProgress = false;
+
+    // Bonus: Quarter of all killed enemies value
+    const bonus = Math.floor(this.waveEnemiesKilledValue * 0.25);
+    if (bonus > 0) {
+      console.log(`Wave Bonus: ${bonus}`);
+      this.money += bonus;
+      this.ui.updateMoney(this.money);
+    }
+
+    this.ui.toggleWaveButton(true);
   }
 
   takeDamage(amount: number) {

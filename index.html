@@ -5,6 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Smash Tower Defense</title>
     <link rel="stylesheet" href="/src/css/style.css" />
+    <style>
+      /* Keeping basic tower btn styles here or could move to style.css */
+      .tower-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 60px;
+        margin-bottom: 10px;
+        padding: 0 15px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #fff;
+      }
+      .tower-btn:hover {
+        transform: scale(1.02);
+        border-color: #333;
+      }
+      .tower-btn.selected {
+        border-color: #3498db;
+        background: #eaf2f8;
+        box-shadow: 0 0 10px rgba(52, 152, 219, 0.5);
+      }
+      .tower-name {
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .tower-cost {
+        font-size: 12px;
+        color: #555;
+      }
+    </style>
   </head>
   <body>
     <div id="app">
@@ -25,6 +59,11 @@
           <div id="wave-menu">
             <button id="start-wave-btn" class="btn">Start Enemy Wave</button>
             <span
+              id="money-display"
+              style="margin-right: 15px; color: #f1c40f; font-weight: bold"
+              >💰 0</span
+            >
+            <span
               id="health-display"
               style="margin-right: 15px; color: #e74c3c; font-weight: bold"
               >Health: --</span
@@ -36,9 +75,19 @@
         <div id="game-area">
           <div id="map-container"></div>
 
-          <div class="controls">
-            <button id="tower-btn" class="btn secondary-btn">
-              Create Basic Tower
+          <div class="controls" id="tower-controls">
+            <!-- Tower buttons will be injected here or statically defined -->
+            <button class="tower-btn" id="btn-tower-basic">
+              <span class="tower-name">Basic</span>
+              <span class="tower-cost">$100</span>
+            </button>
+            <button class="tower-btn" id="btn-tower-sniper">
+              <span class="tower-name">Sniper</span>
+              <span class="tower-cost">$300</span>
+            </button>
+            <button class="tower-btn" id="btn-tower-rapid">
+              <span class="tower-name">Rapid</span>
+              <span class="tower-cost">$250</span>
             </button>
           </div>
         </div>

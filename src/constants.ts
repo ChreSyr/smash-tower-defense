@@ -1,9 +1,10 @@
-import { EnemyType, EnemyConfig } from "./types";
+import { EnemyType, EnemyConfig, TowerType, TowerConfig } from "./types";
 
 export { TileType as TILE_TYPE } from "./types";
 export { EnemyType as ENEMY_TYPE } from "./types";
+export { TowerType as TOWER_TYPE } from "./types";
 
-import { EnemyType as E } from "./types";
+import { EnemyType as E, TowerType as T } from "./types";
 
 export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.BASIC]: {
@@ -12,6 +13,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#e74c3c",
     radius: 0.3,
     damage: 1,
+    killValue: 10,
   },
   [E.FAST]: {
     speed: 4,
@@ -19,6 +21,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#f39c12",
     radius: 0.25,
     damage: 1,
+    killValue: 15,
   },
   [E.HEAVY]: {
     speed: 1,
@@ -26,6 +29,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#8e44ad",
     radius: 0.4,
     damage: 3,
+    killValue: 30,
   },
   [E.BOSS]: {
     speed: 0.5,
@@ -33,6 +37,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#2c3e50",
     radius: 0.45,
     damage: 10,
+    killValue: 200,
   },
   [E.SWARM]: {
     speed: 5,
@@ -40,5 +45,33 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#16a085",
     radius: 0.2,
     damage: 1,
+    killValue: 5,
+  },
+};
+
+export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
+  [T.BASIC]: {
+    name: "Basic",
+    cost: 100,
+    range: 3,
+    damage: 10,
+    fireRate: 1,
+    color: "#3498db",
+  },
+  [T.SNIPER]: {
+    name: "Sniper",
+    cost: 300,
+    range: 7,
+    damage: 50,
+    fireRate: 0.3,
+    color: "#2ecc71",
+  },
+  [T.RAPID]: {
+    name: "Rapid",
+    cost: 250,
+    range: 2,
+    damage: 5,
+    fireRate: 5,
+    color: "#f1c40f",
   },
 };

@@ -13,16 +13,18 @@ export default class GameMap {
     this.tileSize = 0;
   }
 
-  render(containerElement: HTMLElement) {
+  render(containerElement: HTMLElement): HTMLElement {
     containerElement.innerHTML = "";
-    containerElement.className = "game-map";
 
-    containerElement.style.display = "grid";
-    containerElement.style.gridTemplateColumns = `repeat(${this.cols}, 1fr)`;
-    containerElement.style.gridTemplateRows = `repeat(${this.rows}, 1fr)`;
+    // Create the actual grid element
+    const gridElement = document.createElement("div");
+    gridElement.className = "game-map";
+    gridElement.style.display = "grid";
+    // JS in Game.ts will resize this
+    gridElement.style.gridTemplateColumns = `repeat(${this.cols}, 1fr)`;
+    gridElement.style.gridTemplateRows = `repeat(${this.rows}, 1fr)`;
 
-    const rect = containerElement.getBoundingClientRect();
-    this.tileSize = rect.width / this.cols;
+    containerElement.appendChild(gridElement);
 
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {
@@ -31,9 +33,11 @@ export default class GameMap {
         tile.className = `tile ${this.getTileClass(tileType)}`;
         tile.dataset.row = r.toString();
         tile.dataset.col = c.toString();
-        containerElement.appendChild(tile);
+        gridElement.appendChild(tile);
       }
     }
+
+    return gridElement;
   }
 
   getTileClass(type: TileType): string {
