@@ -120,12 +120,15 @@ export default class Game {
       this.setupMapInteraction(gridElement);
 
       // Setup Resizing Logic
-      this.handleResize(mapContainer, gridElement, this.canvas!);
+      const triggerResize = () =>
+        this.handleResize(mapContainer, gridElement, this.canvas!);
+
+      triggerResize();
+      setTimeout(triggerResize, 100);
+      setTimeout(triggerResize, 500); // Failsafe
 
       // Keep reference for cleanup if needed, but usually one game instance per page load
-      window.addEventListener("resize", () =>
-        this.handleResize(mapContainer, gridElement, this.canvas!),
-      );
+      window.addEventListener("resize", triggerResize);
     }
 
     this.ui.updateWaveStatus(0, levelData.waves.length);
@@ -199,14 +202,28 @@ export default class Game {
     canvas: HTMLCanvasElement,
   ) {
     const rect = container.getBoundingClientRect();
+
+    // If container is hidden or 0 size, we can't resize properly yet.
+    if (rect.width === 0 || rect.height === 0) {
+      // console.log("Container has 0 size, skipping resize");
+      return;
+    }
+
     // Calculate max square size that fits with some padding
-    const size = Math.min(rect.width, rect.height) - 20;
+    let size = Math.min(rect.width, rect.height) - 40; // 40px padding
+    if (size < 0) size = 0;
 
     grid.style.width = `${size}px`;
     grid.style.height = `${size}px`;
 
+    // Canvas needs explicit pixel size for resolution
     canvas.width = size;
     canvas.height = size;
+
+    // Force redraw of map?
+    // The grid is CSS grid, so it should reflow.
+    // Canvas needs a render call?
+    this.render();
   }
 
   setupCanvas(container: HTMLElement) {

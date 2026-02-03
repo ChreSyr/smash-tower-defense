@@ -12,7 +12,7 @@ export default class UI {
   waveStatus: HTMLElement;
   healthDisplay: HTMLElement;
   moneyDisplay: HTMLElement;
-  levelTitle: HTMLElement;
+  levelTitle: HTMLElement | null;
 
   // Tower Buttons
   btnTowerBasic: HTMLElement;
@@ -34,7 +34,9 @@ export default class UI {
     this.waveStatus = document.getElementById("wave-status")!;
     this.healthDisplay = document.getElementById("health-display")!;
     this.moneyDisplay = document.getElementById("money-display")!;
-    this.levelTitle = document.querySelector("#game-screen h2") as HTMLElement;
+    this.levelTitle = document.querySelector(
+      "#game-screen h2",
+    ) as HTMLElement | null; // Nullable now
 
     this.btnTowerBasic = document.getElementById("btn-tower-basic")!;
     this.btnTowerSniper = document.getElementById("btn-tower-sniper")!;
@@ -44,7 +46,7 @@ export default class UI {
   showGameScreen(levelName: string) {
     this.homeScreen.classList.add("hidden");
     this.gameScreen.classList.remove("hidden");
-    if (levelName) this.levelTitle.textContent = levelName;
+    if (levelName && this.levelTitle) this.levelTitle.textContent = levelName;
   }
 
   showHomeScreen() {
@@ -57,14 +59,15 @@ export default class UI {
   }
 
   updateHealth(health: number | string) {
-    this.healthDisplay.textContent = `Health: ${health}`;
+    this.healthDisplay.textContent = `${health}`;
+    // If Game Over, maybe styling changes?
     if (health === "GAME OVER") {
-      this.healthDisplay.textContent = "GAME OVER";
+      this.healthDisplay.textContent = "DEAD";
     }
   }
 
   updateMoney(amount: number) {
-    this.moneyDisplay.textContent = `💰 ${amount}`;
+    this.moneyDisplay.textContent = `${amount}`;
   }
 
   toggleWaveButton(enable: boolean) {
