@@ -167,7 +167,7 @@ const data: LevelData = {
   map,
   waves,
   startHealth: 10,
-  startMoney: 250, // Enough for a few towers
+  startMoney: 300, // Enough for a few towers
 };
 
 export default data;

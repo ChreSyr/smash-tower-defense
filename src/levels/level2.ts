@@ -142,7 +142,7 @@ const data: LevelData = {
   map,
   waves,
   startHealth: 20,
-  startMoney: 500,
+  startMoney: 550,
 };
 
 export default data;

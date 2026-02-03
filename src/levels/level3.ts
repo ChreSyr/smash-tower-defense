@@ -135,7 +135,7 @@ const waves = [
   { count: 20, interval: 300, type: E.SWARM },
 
   // Total Health: 750 | Speed: 1 | Difficulty: ~375
-  { count: 3, interval: 2500, type: E.HEAVY },
+  { count: 6, interval: 1500, type: E.HEAVY },
 
   // Total Health: 5000 | Speed: 0.5 | Difficulty: ~1250
   { count: 1, interval: 3000, type: E.TANK },
