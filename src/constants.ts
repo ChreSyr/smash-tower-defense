@@ -10,26 +10,26 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.BASIC]: {
     speed: 2,
     health: 60,
-    color: "#e74c3c",
+    color: "#e91e63", // Pink/Magenta (was red)
     radius: 0.3,
     damage: 1,
-    killValue: 10, // Increased from 10
+    killValue: 10,
   },
   [E.FAST]: {
     speed: 4,
     health: 50,
-    color: "#f39c12",
+    color: "#ff9800", // Bright Orange (was orange)
     radius: 0.25,
     damage: 1,
-    killValue: 20, // Increased from 15
+    killValue: 20,
   },
   [E.HEAVY]: {
     speed: 1,
-    health: 250, // Decreased from 300
+    health: 250,
     color: "#8e44ad",
     radius: 0.4,
     damage: 3,
-    killValue: 50, // Increased from 30
+    killValue: 50,
   },
   [E.BOSS]: {
     speed: 0.5,

@@ -573,6 +573,38 @@ export default class Game {
       this.ctx.lineWidth = 2;
       this.ctx.strokeStyle = "#ffffff";
       this.ctx.stroke();
+
+      // Draw Health Bar
+      const healthBarWidth = radius * 2.5; // Slightly wider than enemy
+      const healthBarHeight = 4;
+      const healthBarX = cx - healthBarWidth / 2;
+      const healthBarY = cy - radius - 8; // Above the enemy
+
+      // Background (dark)
+      this.ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      this.ctx.fillRect(
+        healthBarX,
+        healthBarY,
+        healthBarWidth,
+        healthBarHeight,
+      );
+
+      // Health fill
+      const healthPercent = enemy.health / enemy.maxHealth;
+      const healthWidth = healthBarWidth * healthPercent;
+
+      this.ctx.fillStyle = "#e74c3c"; // Always red
+      this.ctx.fillRect(healthBarX, healthBarY, healthWidth, healthBarHeight);
+
+      // Border
+      this.ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeRect(
+        healthBarX,
+        healthBarY,
+        healthBarWidth,
+        healthBarHeight,
+      );
     });
 
     // Render Particles

@@ -45,6 +45,10 @@ export default class Enemy {
     this.radius = this.config.radius;
   }
 
+  get maxHealth(): number {
+    return this.config.health;
+  }
+
   updateTarget() {
     if (this.pathIndex + 1 < this.path.length) {
       this.pathIndex++;
