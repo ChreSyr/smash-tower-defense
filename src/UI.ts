@@ -189,13 +189,25 @@ export default class UI {
     );
   }
 
-  showVictoryScreen(onHome: () => void, onRestart: () => void) {
+  showVictoryScreen(
+    onHome: () => void,
+    onRestart: () => void,
+    stats?: {
+      time: number;
+      healthPercent: number;
+      money: number;
+      totalScore: number;
+      isNewHighScore: boolean;
+      previousHighScore: number;
+    },
+  ) {
     this.createOverlay(
       "Victory!",
       "All enemies defeated!",
       "victory",
       onHome,
       onRestart,
+      stats,
     );
   }
 
@@ -205,6 +217,14 @@ export default class UI {
     type: string,
     onHome: () => void,
     onRestart: () => void,
+    stats?: {
+      time: number;
+      healthPercent: number;
+      money: number;
+      totalScore: number;
+      isNewHighScore: boolean;
+      previousHighScore: number;
+    },
   ) {
     const container = document.getElementById("game-area");
     if (!container) return;
@@ -249,6 +269,76 @@ export default class UI {
 
     overlay.appendChild(title);
     overlay.appendChild(msg);
+
+    if (stats) {
+      const totalScore = stats.totalScore;
+
+      // Rank Determination
+      let rank = "C";
+      let rankColor = "#bdc3c7";
+      if (totalScore > 12000) {
+        rank = "S";
+        rankColor = "#f1c40f";
+      } else if (totalScore > 9000) {
+        rank = "A";
+        rankColor = "#2ecc71";
+      } else if (totalScore > 6000) {
+        rank = "B";
+        rankColor = "#3498db";
+      }
+
+      const statsDiv = document.createElement("div");
+      statsDiv.className = "victory-stats-card";
+      statsDiv.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+        width: 320px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        animation: slideUp 0.6s ease-out;
+      `;
+
+      statsDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div style="text-align: left;">
+            <div style="color: #ccc; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Final Score</div>
+            <div style="font-size: 2.5rem; font-weight: 800; color: #fff;">${totalScore.toLocaleString()}</div>
+            ${
+              stats.isNewHighScore
+                ? '<div style="color: #f1c40f; font-size: 0.7rem; font-weight: bold; margin-top: 5px; animation: glowPulse 1s infinite alternate;">✨ NEW HIGH SCORE! ✨</div>'
+                : `<div style="color: #aaa; font-size: 0.7rem; margin-top: 5px;">Best: ${stats.previousHighScore.toLocaleString()}</div>`
+            }
+          </div>
+          <div style="width: 70px; height: 70px; border-radius: 50%; background: ${rankColor}; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 900; color: #000; box-shadow: 0 0 20px ${rankColor}88;">
+            ${rank}
+          </div>
+        </div>
+        
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+          <div style="text-align: left;">
+             <div style="color: #aaa; font-size: 0.7rem;">TIME</div>
+             <div style="color: #fff; font-weight: bold;">${Math.floor(stats.time)} units</div>
+          </div>
+          <div style="text-align: left;">
+             <div style="color: #aaa; font-size: 0.7rem;">HEALTH</div>
+             <div style="color: #2ecc71; font-weight: bold;">${stats.healthPercent}%</div>
+          </div>
+          <div style="text-align: left;">
+             <div style="color: #aaa; font-size: 0.7rem;">GOLD LEFT</div>
+             <div style="color: #f1c40f; font-weight: bold;">$${stats.money}</div>
+          </div>
+          <div style="text-align: left;">
+             <div style="color: #aaa; font-size: 0.7rem;">STATUS</div>
+             <div style="color: #fff; font-weight: bold;">CLEARED</div>
+          </div>
+        </div>
+      `;
+      overlay.appendChild(statsDiv);
+    }
+
     overlay.appendChild(buttonContainer);
 
     container.appendChild(overlay);

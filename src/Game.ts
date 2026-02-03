@@ -30,7 +30,9 @@ export default class Game {
   playerHealth: number;
   money: number;
   waveInProgress: boolean;
-  waveEnemiesKilledValue: number; // To track value for wave end bonus
+  waveEnemiesKilledValue: number;
+  totalGameTime: number; // For score calculation
+  maxHealth: number; // For % calculation
 
   lastTime: number;
   isPlaying: boolean;
@@ -47,6 +49,7 @@ export default class Game {
   // Current level tracking for restart
   currentLevelData: LevelData | null = null;
   currentLevelTitle: string = "";
+  highScores: { [levelName: string]: number } = {}; // In-memory high scores
 
   constructor() {
     this.ui = new UI();
@@ -62,6 +65,8 @@ export default class Game {
     this.money = 0;
     this.waveInProgress = false;
     this.waveEnemiesKilledValue = 0;
+    this.totalGameTime = 0;
+    this.maxHealth = 10;
 
     this.lastTime = 0;
     this.isPlaying = false;
@@ -107,8 +112,10 @@ export default class Game {
     this.currentLevelData = levelData;
     this.currentLevelTitle = title;
 
-    this.playerHealth = levelData.startHealth || 10;
+    this.maxHealth = levelData.startHealth || 10;
+    this.playerHealth = this.maxHealth;
     this.money = levelData.startMoney || 100;
+    this.totalGameTime = 0;
     this.ui.updateHealth(this.playerHealth);
     this.ui.updateMoney(this.money);
     this.ui.updateTowerAvailability(this.money);
@@ -370,6 +377,10 @@ export default class Game {
 
     this.waveManager.update(deltaTime);
 
+    if (this.waveInProgress) {
+      this.totalGameTime += deltaTime;
+    }
+
     // Update Towers
     this.towers.forEach((tower) => tower.update(deltaTime, this.enemies));
 
@@ -453,9 +464,32 @@ export default class Game {
     if (this.waveManager.isLastWave()) {
       console.log("VICTORY");
       this.isPlaying = false;
+      const healthPercent = Math.round(
+        (this.playerHealth / this.maxHealth) * 100,
+      );
+      const healthBonus = healthPercent * 50;
+      const moneyBonus = this.money * 2;
+      const timeFactor = Math.max(0, 10000 - this.totalGameTime * 50);
+      const totalScore = Math.floor(healthBonus + moneyBonus + timeFactor);
+
+      const previousHighScore = this.highScores[this.currentLevelTitle] || 0;
+      const isNewHighScore = totalScore > previousHighScore;
+
+      if (isNewHighScore) {
+        this.highScores[this.currentLevelTitle] = totalScore;
+      }
+
       this.ui.showVictoryScreen(
         () => this.goHome(),
         () => this.restartLevel(),
+        {
+          time: this.totalGameTime,
+          healthPercent: healthPercent,
+          money: this.money,
+          totalScore: totalScore,
+          isNewHighScore: isNewHighScore,
+          previousHighScore: previousHighScore,
+        },
       );
     } else {
       this.ui.toggleWaveButton(true);
