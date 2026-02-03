@@ -6,8 +6,16 @@ import Level1 from "./levels/level1";
 import Level2 from "./levels/level2";
 import Level3 from "./levels/level3";
 import Level4 from "./levels/level4";
+import Level5 from "./levels/level5";
 import Enemy from "./Enemy";
-import { LevelData, PathNode, EnemyType, TowerType, Particle } from "./types";
+import {
+  LevelData,
+  PathNode,
+  EnemyType,
+  TowerType,
+  Particle,
+  TileType,
+} from "./types";
 import { TOWER_CONFIG } from "./constants";
 
 export default class Game {
@@ -73,6 +81,7 @@ export default class Game {
     this.ui.onPlayLevel2(() => this.startGame(Level2, "Level 2"));
     this.ui.onPlayLevel3(() => this.startGame(Level3, "Level 3"));
     this.ui.onPlayLevel4(() => this.startGame(Level4, "Level 4"));
+    this.ui.onPlayLevel5(() => this.startGame(Level5, "Level 5"));
     this.ui.onHome(() => this.goHome());
     this.ui.onRestart(() => this.restartLevel());
 
@@ -186,39 +195,48 @@ export default class Game {
 
   handleTileClick(row: number, col: number) {
     if (!this.selectedTowerType) return;
-    if (!this.map) return;
-
-    const tileType = this.map.grid[row][col];
-
-    // 1. Check if buildable
-    if (tileType !== 1) {
-      // 1 is BUILDABLE in enum, waiting for proper import usage or check types.ts
-      // Actually let's use the enum if we can, or just assume logic for now.
-      // tileType from map.grid is number (enum).
-      // Enum: EMPTY=0, BUILDABLE=1
-      console.log("Not a buildable tile");
+    if (!this.canPlaceTower(this.selectedTowerType, col, row)) {
       return;
     }
 
-    // 2. Check if occupied
-    const occupied = this.towers.find((t) => t.y === row && t.x === col);
-    if (occupied) {
-      console.log("Tile occupied");
-      return;
-    }
-
-    // 3. Check cost
     const config = TOWER_CONFIG[this.selectedTowerType];
-    if (this.money < config.cost) {
-      console.log("Not enough money");
-      return;
-    }
-
     // Place Tower
     this.placeTower(this.selectedTowerType, col, row, config.cost);
   }
 
+  /**
+   * Safe check to see if a tower can be placed at a specific location
+   */
+  canPlaceTower(type: TowerType, col: number, row: number): boolean {
+    if (!this.map) return false;
+
+    // 1. Check bounds
+    if (row < 0 || row >= this.map.rows || col < 0 || col >= this.map.cols)
+      return false;
+
+    // 2. Check if buildable
+    const tileType = this.map.grid[row][col];
+    if (tileType !== TileType.BUILDABLE) return false;
+
+    // 3. Check if occupied
+    const isOccupied = this.towers.some(
+      (t) => Math.floor(t.y) === row && Math.floor(t.x) === col,
+    );
+    if (isOccupied) return false;
+
+    // 4. Check cost
+    const config = TOWER_CONFIG[type];
+    if (this.money < config.cost) return false;
+
+    return true;
+  }
+
   placeTower(type: TowerType, x: number, y: number, cost: number) {
+    if (this.money < cost) {
+      console.error("Critical: Attempted to place tower without enough money");
+      return;
+    }
+
     this.money -= cost;
     this.ui.updateMoney(this.money);
     this.ui.updateTowerAvailability(this.money);
@@ -539,26 +557,24 @@ export default class Game {
       }
     });
 
-    // Render Tower Placement Preview (Ghost Tower + Range Circle)
+    // Draw Placement Preview (Ghost Tower + Range Circle)
     if (
       this.selectedTowerType &&
       this.hoverTileRow >= 0 &&
-      this.hoverTileCol >= 0
+      this.hoverTileCol >= 0 &&
+      this.map
     ) {
       const config = TOWER_CONFIG[this.selectedTowerType];
       const centerX = (this.hoverTileCol + 0.5) * tileSize;
       const centerY = (this.hoverTileRow + 0.5) * tileSize;
 
-      // Check if placement is valid
-      const tileType = this.map.grid[this.hoverTileRow][this.hoverTileCol];
-      const isOccupied = this.towers.find(
-        (t) => t.y === this.hoverTileRow && t.x === this.hoverTileCol,
+      const isValid = this.canPlaceTower(
+        this.selectedTowerType,
+        this.hoverTileCol,
+        this.hoverTileRow,
       );
-      const canAfford = this.money >= config.cost;
-      const isBuildable = tileType === 1; // 1 = BUILDABLE
-      const isValid = isBuildable && !isOccupied && canAfford;
 
-      // Only show preview if placement is valid
+      // Only show preview if placement is valid (buildable, not occupied, affordable)
       if (isValid) {
         // Draw Range Circle
         this.ctx.beginPath();

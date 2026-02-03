@@ -6,6 +6,7 @@ export default class UI {
   playBtn2: HTMLElement | null;
   playBtn3: HTMLElement | null;
   playBtn4: HTMLElement | null;
+  playBtn5: HTMLElement | null;
   homeBtn: HTMLElement | null;
   restartBtn: HTMLElement | null;
 
@@ -30,6 +31,7 @@ export default class UI {
     this.playBtn2 = document.getElementById("play-btn-2");
     this.playBtn3 = document.getElementById("play-btn-3");
     this.playBtn4 = document.getElementById("play-btn-4");
+    this.playBtn5 = document.getElementById("play-btn-5");
     this.homeBtn = document.getElementById("home-btn");
     this.restartBtn = document.getElementById("restart-btn");
 
@@ -105,6 +107,10 @@ export default class UI {
 
   onPlayLevel4(callback: () => void) {
     if (this.playBtn4) this.playBtn4.addEventListener("click", callback);
+  }
+
+  onPlayLevel5(callback: () => void) {
+    if (this.playBtn5) this.playBtn5.addEventListener("click", callback);
   }
 
   onHome(callback: () => void) {
