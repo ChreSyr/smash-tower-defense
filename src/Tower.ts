@@ -48,9 +48,9 @@ export default class Tower {
   }
 
   findTarget(enemies: Enemy[]): Enemy | null {
-    // Simple logic: Find closest in range
-    let closest: Enemy | null = null;
-    let minDist = Infinity;
+    // Target enemy with lowest health in range
+    let target: Enemy | null = null;
+    let minHealth = Infinity;
 
     // Range is in grid units. Config.range e.g. 3.
     const rangeSq = this.config.range * this.config.range;
@@ -65,14 +65,15 @@ export default class Tower {
       const distSq = dx * dx + dy * dy;
 
       if (distSq <= rangeSq) {
-        if (distSq < minDist) {
-          minDist = distSq;
-          closest = enemy;
+        // Prioritize lowest health
+        if (enemy.health < minHealth) {
+          minHealth = enemy.health;
+          target = enemy;
         }
       }
     }
 
-    return closest;
+    return target;
   }
 
   shoot(enemy: Enemy) {

@@ -31,6 +31,8 @@ export default class Game {
   // State
   selectedTowerType: TowerType | null = null;
   towers: Tower[] = [];
+  hoverTileRow: number = -1;
+  hoverTileCol: number = -1;
 
   constructor() {
     this.ui = new UI();
@@ -145,6 +147,28 @@ export default class Game {
         }
       }
     });
+
+    // Track hover for tower placement preview
+    gridElement.addEventListener("mousemove", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains("tile")) {
+        const row = parseInt(target.dataset.row || "-1");
+        const col = parseInt(target.dataset.col || "-1");
+        if (row >= 0 && col >= 0) {
+          this.hoverTileRow = row;
+          this.hoverTileCol = col;
+        }
+      } else {
+        this.hoverTileRow = -1;
+        this.hoverTileCol = -1;
+      }
+    });
+
+    // Clear hover when mouse leaves
+    gridElement.addEventListener("mouseleave", () => {
+      this.hoverTileRow = -1;
+      this.hoverTileCol = -1;
+    });
   }
 
   handleTileClick(row: number, col: number) {
@@ -191,9 +215,9 @@ export default class Game {
 
     console.log(`Placed ${type} tower at ${x},${y}`);
 
-    // Deselect logic? Optional. Let's keep selected for multi-build?
-    // User requirement specifically said "Select a tower then click", didn't specify auto-deselect.
-    // Usually keeping it selected is nicer.
+    // Deselect tower after placement
+    this.selectedTowerType = null;
+    this.ui.highlightTower(null);
   }
 
   handleResize(
@@ -329,7 +353,8 @@ export default class Game {
       }
     }
 
-    if (this.waveInProgress) {
+    // Check wave completion ONLY if player is still alive
+    if (this.waveInProgress && this.playerHealth > 0) {
       if (!this.waveManager.isSpawning() && this.enemies.length === 0) {
         this.endWave();
       }
@@ -445,28 +470,37 @@ export default class Game {
         const targetX = tower.target.x * tileSize;
         const targetY = tower.target.y * tileSize;
 
-        // Laser Color based on tower type
-        let color = "52, 152, 219"; // Blue default
-        let width = 4;
+        // Laser Color based on tower type (lighter versions of tower colors)
+        let color = "100, 181, 246"; // Light blue (lighter than #2980b9)
+        let width = 8;
 
         if (tower.type === TowerType.SNIPER) {
-          color = "231, 76, 60"; // Red
-          width = 6;
+          color = "239, 83, 80"; // Light red (lighter than #c0392b)
+          width = 10;
         } else if (tower.type === TowerType.RAPID) {
-          color = "241, 196, 15"; // Yellow
-          width = 3;
+          color = "255, 183, 77"; // Light gold (lighter than #f39c12)
+          width = 6;
         }
 
-        // Draw Glow (Outer line)
+        // Layer 1: Outer Glow (widest, most transparent)
         this.ctx.beginPath();
         this.ctx.moveTo(center.x, center.y);
         this.ctx.lineTo(targetX, targetY);
-        this.ctx.lineWidth = width * 3; // 3x width for glow
-        this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity * 0.3})`;
+        this.ctx.lineWidth = width * 4; // 4x width for outer glow
+        this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity * 0.15})`;
         this.ctx.lineCap = "round";
         this.ctx.stroke();
 
-        // Draw Core (Inner line)
+        // Layer 2: Middle Glow (medium width, semi-transparent)
+        this.ctx.beginPath();
+        this.ctx.moveTo(center.x, center.y);
+        this.ctx.lineTo(targetX, targetY);
+        this.ctx.lineWidth = width * 2; // 2x width for middle glow
+        this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity * 0.4})`;
+        this.ctx.lineCap = "round";
+        this.ctx.stroke();
+
+        // Layer 3: Core Beam (bright and solid)
         this.ctx.beginPath();
         this.ctx.moveTo(center.x, center.y);
         this.ctx.lineTo(targetX, targetY);
@@ -474,8 +508,56 @@ export default class Game {
         this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity})`;
         this.ctx.lineCap = "round";
         this.ctx.stroke();
+        this.ctx.lineCap = "round";
+        this.ctx.stroke();
       }
     });
+
+    // Render Tower Placement Preview (Ghost Tower + Range Circle)
+    if (
+      this.selectedTowerType &&
+      this.hoverTileRow >= 0 &&
+      this.hoverTileCol >= 0
+    ) {
+      const config = TOWER_CONFIG[this.selectedTowerType];
+      const centerX = (this.hoverTileCol + 0.5) * tileSize;
+      const centerY = (this.hoverTileRow + 0.5) * tileSize;
+
+      // Check if placement is valid
+      const tileType = this.map.grid[this.hoverTileRow][this.hoverTileCol];
+      const isOccupied = this.towers.find(
+        (t) => t.y === this.hoverTileRow && t.x === this.hoverTileCol,
+      );
+      const canAfford = this.money >= config.cost;
+      const isBuildable = tileType === 1; // 1 = BUILDABLE
+      const isValid = isBuildable && !isOccupied && canAfford;
+
+      // Only show preview if placement is valid
+      if (isValid) {
+        // Draw Range Circle
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, config.range * tileSize, 0, Math.PI * 2);
+        this.ctx.strokeStyle = "rgba(46, 204, 113, 0.5)"; // Green
+        this.ctx.lineWidth = 2;
+        this.ctx.setLineDash([5, 5]); // Dashed line
+        this.ctx.stroke();
+        this.ctx.setLineDash([]); // Reset to solid
+
+        // Fill range circle with subtle color
+        this.ctx.fillStyle = "rgba(46, 204, 113, 0.1)";
+        this.ctx.fill();
+
+        // Draw Ghost Tower
+        const size = tileSize * 0.8;
+        this.ctx.fillStyle = config.color + "80"; // Add alpha for transparency (50%)
+        this.ctx.fillRect(centerX - size / 2, centerY - size / 2, size, size);
+
+        // Border for ghost tower
+        this.ctx.strokeStyle = config.color + "CC"; // More opaque border
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(centerX - size / 2, centerY - size / 2, size, size);
+      }
+    }
 
     // Render Enemies
     this.enemies.forEach((enemy) => {

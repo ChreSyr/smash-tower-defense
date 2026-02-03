@@ -33,11 +33,11 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   },
   [E.BOSS]: {
     speed: 0.5,
-    health: 1000,
+    health: 5000, // 50x Basic
     color: "#2c3e50",
     radius: 0.45,
     damage: 10,
-    killValue: 300, // Increased from 200
+    killValue: 1000,
   },
   [E.SWARM]: {
     speed: 5,
@@ -56,7 +56,7 @@ export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
     range: 3.5, // Buffer range
     damage: 20, // Buffed from 10
     fireRate: 1,
-    color: "#3498db",
+    color: "#2980b9", // Deep blue
   },
   [T.SNIPER]: {
     name: "Sniper",
@@ -64,7 +64,7 @@ export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
     range: 8, // Buffed from 7
     damage: 100, // Buffed from 50 (One shot kills basic)
     fireRate: 0.4, // Buffed from 0.3
-    color: "#2ecc71",
+    color: "#c0392b", // Deep red (matches laser)
   },
   [T.RAPID]: {
     name: "Rapid",
@@ -72,6 +72,6 @@ export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
     range: 2.5,
     damage: 4,
     fireRate: 8, // Very fast
-    color: "#f1c40f",
+    color: "#f39c12", // Deep gold/orange (matches laser)
   },
 };

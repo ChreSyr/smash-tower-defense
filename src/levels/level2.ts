@@ -125,12 +125,25 @@ const map = [
 ];
 
 const waves = [
-  { count: 15, interval: 500, type: E.SWARM }, // Easy start
-  { count: 10, interval: 1200, type: E.BASIC },
-  { count: 8, interval: 1000, type: E.FAST },
-  { count: 25, interval: 400, type: E.SWARM },
-  { count: 6, interval: 2000, type: E.HEAVY },
-  { count: 2, interval: 4000, type: E.BOSS },
+  // Wave 1: Swarm Intro
+  // Total Health: 800 (40 * 20) | Speed: 5 | Difficulty: ~1000
+  { count: 40, interval: 400, type: E.SWARM },
+
+  // Wave 2: Standard
+  // Total Health: 2000 | Speed: 2 | Difficulty: ~2000
+  { count: 20, interval: 1000, type: E.BASIC },
+
+  // Wave 3: Heavy Armor
+  // Total Health: 5000 | Speed: 1 | Difficulty: ~2500
+  { count: 20, interval: 1500, type: E.HEAVY },
+
+  // Wave 4: Speed Rush
+  // Total Health: 2500 | Speed: 4 | Difficulty: ~4000
+  { count: 50, interval: 500, type: E.FAST },
+
+  // Wave 5: Double Boss
+  // Total Health: 10000 | Speed: 0.5 | Difficulty: ~10000
+  { count: 2, interval: 5000, type: E.BOSS },
 ];
 
 const data: LevelData = {
