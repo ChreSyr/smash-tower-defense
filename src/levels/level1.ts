@@ -144,7 +144,7 @@ const waves = [
   { count: 4, interval: 2000, type: E.HEAVY },
 
   // Total Health: 5000 | Speed: 0.5 | Difficulty: ~1250
-  { count: 1, interval: 3000, type: E.BOSS },
+  { count: 1, interval: 3000, type: E.TANK },
 ];
 
 // Helper to calculate difficulty (for dev reference)
@@ -155,7 +155,7 @@ export function calculateDifficulty(wave: { count: number; type: E }) {
     basic: { hp: 100, spd: 2 },
     fast: { hp: 50, spd: 4 },
     heavy: { hp: 250, spd: 1 },
-    boss: { hp: 5000, spd: 0.5 },
+    TANK: { hp: 5000, spd: 0.5 },
     swarm: { hp: 20, spd: 5 },
   };
   const s = stats[wave.type];

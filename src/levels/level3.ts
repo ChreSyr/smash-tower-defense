@@ -106,7 +106,7 @@ const map = [
     T.BUILDABLE,
     T.BUILDABLE,
     T.BUILDABLE,
-    T.END,
+    T.PATH,
     T.BUILDABLE,
     T.OBSTACLE,
   ],
@@ -118,7 +118,7 @@ const map = [
     T.OBSTACLE,
     T.OBSTACLE,
     T.OBSTACLE,
-    T.OBSTACLE,
+    T.END,
     T.OBSTACLE,
     T.OBSTACLE,
   ],
@@ -138,7 +138,7 @@ const waves = [
   { count: 3, interval: 2500, type: E.HEAVY },
 
   // Total Health: 5000 | Speed: 0.5 | Difficulty: ~1250
-  { count: 1, interval: 3000, type: E.BOSS },
+  { count: 1, interval: 3000, type: E.TANK },
 ];
 
 const data: LevelData = {

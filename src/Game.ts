@@ -5,6 +5,7 @@ import GameMap from "./Map";
 import Level1 from "./levels/level1";
 import Level2 from "./levels/level2";
 import Level3 from "./levels/level3";
+import Level4 from "./levels/level4";
 import Enemy from "./Enemy";
 import { LevelData, PathNode, EnemyType, TowerType, Particle } from "./types";
 import { TOWER_CONFIG } from "./constants";
@@ -71,6 +72,7 @@ export default class Game {
     this.ui.onPlayLevel1(() => this.startGame(Level1, "Level 1"));
     this.ui.onPlayLevel2(() => this.startGame(Level2, "Level 2"));
     this.ui.onPlayLevel3(() => this.startGame(Level3, "Level 3"));
+    this.ui.onPlayLevel4(() => this.startGame(Level4, "Level 4"));
     this.ui.onHome(() => this.goHome());
     this.ui.onRestart(() => this.restartLevel());
 

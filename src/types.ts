@@ -11,7 +11,7 @@ export enum EnemyType {
   BASIC = "basic",
   FAST = "fast",
   HEAVY = "heavy",
-  BOSS = "boss",
+  TANK = "TANK",
   SWARM = "swarm",
 }
 

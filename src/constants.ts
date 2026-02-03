@@ -13,15 +13,15 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#da517eff",
     radius: 0.3,
     damage: 1,
-    killValue: 10,
+    killValue: 5,
   },
   [E.FAST]: {
     speed: 5,
-    health: 50,
+    health: 60,
     color: "#ff9800",
     radius: 0.25,
     damage: 1,
-    killValue: 20,
+    killValue: 5,
   },
   [E.HEAVY]: {
     speed: 1,
@@ -29,7 +29,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#8e44ad",
     radius: 0.4,
     damage: 3,
-    killValue: 50, // highest value
+    killValue: 25, // highest value
   },
   [E.SWARM]: {
     speed: 7,
@@ -37,15 +37,15 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#16a085",
     radius: 0.2,
     damage: 1,
-    killValue: 8,
+    killValue: 4,
   },
-  [E.BOSS]: {
+  [E.TANK]: {
     speed: 0.5,
     health: 5000,
     color: "#2c3e50",
     radius: 0.45,
-    damage: 10,
-    killValue: 10, // mdr
+    damage: 20,
+    killValue: 5, // mdr
   },
 };
 
