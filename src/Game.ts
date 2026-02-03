@@ -318,6 +318,7 @@ export default class Game {
     this.isPlaying = false;
     this.enemies = [];
     this.towers = [];
+    this.ui.updateHighScores(this.highScores);
     this.ui.showHomeScreen();
   }
 
@@ -493,6 +494,19 @@ export default class Game {
       );
     } else {
       this.ui.toggleWaveButton(true);
+
+      // Auto-Wave handling
+      if (this.ui.isAutoWaveEnabled()) {
+        setTimeout(() => {
+          if (
+            !this.waveInProgress &&
+            this.isPlaying &&
+            this.ui.isAutoWaveEnabled()
+          ) {
+            this.startWave();
+          }
+        }, 1000); // 1-second delay before next wave
+      }
     }
   }
 
@@ -533,8 +547,8 @@ export default class Game {
       const size = tileSize * 0.8;
       this.ctx.fillRect(center.x - size / 2, center.y - size / 2, size, size);
 
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeStyle = "#333";
+      this.ctx.lineWidth = 1;
+      this.ctx.strokeStyle = "rgba(52, 152, 219, 0.5)";
       this.ctx.strokeRect(center.x - size / 2, center.y - size / 2, size, size);
 
       // Helper range ring (optional, maybe only when selected or hovered?)
@@ -549,15 +563,15 @@ export default class Game {
         const targetY = tower.target.y * tileSize;
 
         // Laser Color based on tower type (lighter versions of tower colors)
-        let color = "100, 181, 246"; // Light blue (lighter than #2980b9)
-        let width = 8;
+        let color = "52, 152, 219"; // Tactical Blue (#3498db)
+        let width = 6;
 
         if (tower.type === TowerType.SNIPER) {
-          color = "239, 83, 80"; // Light red (lighter than #c0392b)
+          color = "231, 76, 60"; // Laser Red (#e74c3c)
           width = 10;
         } else if (tower.type === TowerType.RAPID) {
-          color = "255, 183, 77"; // Light gold (lighter than #f39c12)
-          width = 6;
+          color = "243, 156, 18"; // Electric Amber (#f39c12)
+          width = 4;
         }
 
         // Layer 1: Outer Glow (widest, most transparent)
@@ -613,14 +627,14 @@ export default class Game {
         // Draw Range Circle
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, config.range * tileSize, 0, Math.PI * 2);
-        this.ctx.strokeStyle = "rgba(46, 204, 113, 0.5)"; // Green
+        this.ctx.strokeStyle = "rgba(52, 152, 219, 0.5)";
         this.ctx.lineWidth = 2;
         this.ctx.setLineDash([5, 5]); // Dashed line
         this.ctx.stroke();
         this.ctx.setLineDash([]); // Reset to solid
 
         // Fill range circle with subtle color
-        this.ctx.fillStyle = "rgba(46, 204, 113, 0.1)";
+        this.ctx.fillStyle = "rgba(52, 152, 219, 0.05)";
         this.ctx.fill();
 
         // Draw Ghost Tower

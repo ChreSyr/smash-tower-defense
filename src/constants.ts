@@ -10,7 +10,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.BASIC]: {
     speed: 2,
     health: 60,
-    color: "#da517eff",
+    color: "#ff0080", // Neon Pink
     radius: 0.3,
     damage: 1,
     killValue: 5,
@@ -18,7 +18,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.FAST]: {
     speed: 5,
     health: 60,
-    color: "#ff9800",
+    color: "#f1c40f", // Neon Yellow
     radius: 0.25,
     damage: 1,
     killValue: 5,
@@ -26,15 +26,15 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.HEAVY]: {
     speed: 1,
     health: 250,
-    color: "#8e44ad",
+    color: "#a020f0", // Toxic Purple
     radius: 0.4,
     damage: 3,
-    killValue: 25, // highest value
+    killValue: 25,
   },
   [E.SWARM]: {
     speed: 7,
-    health: 26, // Not 1-shot by BASIC
-    color: "#16a085",
+    health: 26,
+    color: "#00ffff", // Electric Cyan
     radius: 0.2,
     damage: 1,
     killValue: 4,
@@ -42,40 +42,40 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.TANK]: {
     speed: 0.5,
     health: 5000,
-    color: "#2c3e50",
+    color: "#e74c3c", // Tactical Red (Core)
     radius: 0.45,
     damage: 20,
-    killValue: 5, // mdr
+    killValue: 5,
   },
 };
 
 export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
   // Good dps, good fire rate, good range
   [T.BASIC]: {
-    name: "Basic",
+    name: "Standard",
     cost: 100,
     range: 3.5,
     damage: 25,
     fireRate: 2,
-    color: "#2980b9",
+    color: "#3498db", // Tactical Blue
   },
   // Excellent dps, bad fire rate, excellent range
   [T.SNIPER]: {
-    name: "Sniper",
+    name: "Sniper MK1",
     cost: 300,
     range: 8,
     damage: 100,
     fireRate: 1,
-    color: "#c0392b",
+    color: "#e74c3c", // Laser Red
   },
   // Good dps, excellent fire rate, bad range
   [T.RAPID]: {
-    name: "Rapid",
+    name: "Rapid Fire",
     cost: 150,
     range: 2.5,
     damage: 8,
     fireRate: 8,
-    color: "#f39c12",
+    color: "#f39c12", // Electric Amber
   },
 };
 

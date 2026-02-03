@@ -11,6 +11,7 @@ export default class UI {
   restartBtn: HTMLElement | null;
 
   startWaveBtn: HTMLButtonElement;
+  autoWaveToggle: HTMLInputElement;
 
   // Info Displays
   waveStatus: HTMLElement;
@@ -42,6 +43,9 @@ export default class UI {
     this.waveStatus = document.getElementById("wave-status")!;
     this.healthDisplay = document.getElementById("health-display")!;
     this.moneyDisplay = document.getElementById("money-display")!;
+    this.autoWaveToggle = document.getElementById(
+      "auto-wave-toggle",
+    ) as HTMLInputElement;
     this.levelTitle = document.querySelector(
       "#game-screen h2",
     ) as HTMLElement | null; // Nullable now
@@ -54,7 +58,23 @@ export default class UI {
   showGameScreen(levelName: string) {
     this.homeScreen.classList.add("hidden");
     this.gameScreen.classList.remove("hidden");
-    if (levelName && this.levelTitle) this.levelTitle.textContent = levelName;
+
+    if (this.levelTitle) {
+      // Format level name like the home screen cards
+      const match = levelName.match(/Level (\d+)/);
+      const num = match ? match[1].padStart(2, "0") : "XX";
+
+      const missionNames: { [key: string]: string } = {
+        "Level 1": "GREEN VALLEY",
+        "Level 2": "THE LABYRINTH",
+        "Level 3": "CORNER PASS",
+        "Level 4": "CIRCULAR ARENA",
+        "Level 5": "THE FINAL GATE",
+      };
+
+      const name = missionNames[levelName] || "UNKNOWN MISSION";
+      this.levelTitle.innerHTML = `LEVEL <span class="accent">${num}</span>: ${name}`;
+    }
   }
 
   showHomeScreen() {
@@ -81,15 +101,15 @@ export default class UI {
   toggleWaveButton(enable: boolean) {
     if (enable) {
       this.startWaveBtn.disabled = false;
-      this.startWaveBtn.style.opacity = "1";
-      this.startWaveBtn.style.cursor = "pointer";
-      this.startWaveBtn.textContent = "Start Enemy Wave";
+      this.startWaveBtn.textContent = "ENGAGE";
     } else {
       this.startWaveBtn.disabled = true;
-      this.startWaveBtn.style.opacity = "0.5";
-      this.startWaveBtn.style.cursor = "not-allowed";
-      this.startWaveBtn.textContent = "Wave In Progress...";
+      this.startWaveBtn.textContent = "IN PROGRESS";
     }
+  }
+
+  isAutoWaveEnabled(): boolean {
+    return this.autoWaveToggle.checked;
   }
 
   // Event listener helpers
@@ -148,6 +168,27 @@ export default class UI {
     this.toggleTowerAbility(this.btnTowerRapid, money, 150); // Updated from 250
   }
 
+  updateHighScores(scores: { [levelName: string]: number }) {
+    // We map the level titles to their card IDs
+    const levelMap: { [key: string]: string } = {
+      "Level 1": "score-1",
+      "Level 2": "score-2",
+      "Level 3": "score-3",
+      "Level 4": "score-4",
+      "Level 5": "score-5",
+    };
+
+    for (const [levelName, score] of Object.entries(scores)) {
+      const id = levelMap[levelName];
+      if (id) {
+        const element = document.getElementById(id);
+        if (element) {
+          element.textContent = score.toLocaleString();
+        }
+      }
+    }
+  }
+
   private toggleTowerAbility(btn: HTMLElement, money: number, cost: number) {
     if (money >= cost) {
       btn.classList.remove("disabled");
@@ -175,8 +216,10 @@ export default class UI {
   highlightSpeed(speed: number) {
     document
       .querySelectorAll("#speed-controls .btn")
-      .forEach((btn) => ((btn as HTMLElement).style.background = ""));
-    document.getElementById(`speed-${speed}x`)!.style.background = "#2ecc71";
+      .forEach((btn) => btn.classList.remove("active"));
+
+    const activeBtn = document.getElementById(`speed-${speed}x`);
+    if (activeBtn) activeBtn.classList.add("active");
   }
 
   showGameOverScreen(onHome: () => void, onRestart: () => void) {

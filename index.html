@@ -13,26 +13,85 @@
     <div id="app">
       <!-- Home Screen -->
       <section id="home-screen">
-        <h1>Smash Tower Defense</h1>
-        <div class="level-select">
-          <button id="play-btn-1" class="btn primary-btn">Play Level 1</button>
-          <button id="play-btn-2" class="btn primary-btn">Play Level 2</button>
-          <button id="play-btn-3" class="btn primary-btn">Play Level 3</button>
-          <button id="play-btn-4" class="btn primary-btn">Play Level 4</button>
-          <button id="play-btn-5" class="btn primary-btn">Play Level 5</button>
+        <div class="home-background"></div>
+        <div class="home-content">
+          <div class="hero-section">
+            <h1 class="game-title">
+              SMASH <span class="accent">TOWER</span> DEFENSE
+            </h1>
+            <p class="game-subtitle">Protect the core at all costs</p>
+          </div>
+
+          <div class="level-grid">
+            <!-- Level 1 -->
+            <div class="level-card" id="card-1">
+              <div class="level-number">01</div>
+              <div class="level-info">
+                <h3>Green Valley</h3>
+                <div class="level-score">Best: <span id="score-1">0</span></div>
+              </div>
+              <button id="play-btn-1" class="play-btn-card">Enter Map</button>
+            </div>
+
+            <!-- Level 2 -->
+            <div class="level-card" id="card-2">
+              <div class="level-number">02</div>
+              <div class="level-info">
+                <h3>The Labyrinth</h3>
+                <div class="level-score">Best: <span id="score-2">0</span></div>
+              </div>
+              <button id="play-btn-2" class="play-btn-card">Enter Map</button>
+            </div>
+
+            <!-- Level 3 -->
+            <div class="level-card" id="card-3">
+              <div class="level-number">03</div>
+              <div class="level-info">
+                <h3>Corner Pass</h3>
+                <div class="level-score">Best: <span id="score-3">0</span></div>
+              </div>
+              <button id="play-btn-3" class="play-btn-card">Enter Map</button>
+            </div>
+
+            <!-- Level 4 -->
+            <div class="level-card" id="card-4">
+              <div class="level-number">04</div>
+              <div class="level-info">
+                <h3>Circular Arena</h3>
+                <div class="level-score">Best: <span id="score-4">0</span></div>
+              </div>
+              <button id="play-btn-4" class="play-btn-card">Enter Map</button>
+            </div>
+
+            <!-- Level 5 -->
+            <div class="level-card" id="card-5">
+              <div class="level-number">05</div>
+              <div class="level-info">
+                <h3>The Final Gate</h3>
+                <div class="level-score">Best: <span id="score-5">0</span></div>
+              </div>
+              <button id="play-btn-5" class="play-btn-card">Enter Map</button>
+            </div>
+          </div>
         </div>
       </section>
 
-      <!-- Game Screen -->
       <section id="game-screen" class="hidden">
         <header class="game-header">
           <div class="header-section left">
-            <button id="home-btn" class="btn secondary-btn">
-              <span class="icon">&#8962;</span> Home
-            </button>
-            <button id="restart-btn" class="btn secondary-btn">
-              <span class="icon">&#8634;</span> Restart
-            </button>
+            <div class="nav-container">
+              <button id="home-btn" class="nav-btn" title="Back to Base">
+                <span class="icon">&#8962;</span>
+              </button>
+              <button id="restart-btn" class="nav-btn" title="Restart Mission">
+                <span class="icon">&#8634;</span>
+              </button>
+            </div>
+            <div class="mission-info">
+              <h2 id="level-title-display" class="game-title mini">
+                LEVEL <span class="accent">0X</span>: MISSION NAME
+              </h2>
+            </div>
           </div>
 
           <div class="header-section center">
@@ -57,9 +116,18 @@
               <button class="btn speed-btn" id="speed-4x">4x</button>
             </div>
 
-            <button id="start-wave-btn" class="btn primary-btn action-btn">
-              Start Wave &#9658;
-            </button>
+            <div class="action-container">
+              <button id="start-wave-btn" class="btn primary-btn action-btn">
+                ENGAGE &#9658;
+              </button>
+              <div class="auto-wave-wrapper">
+                <label class="switch">
+                  <input type="checkbox" id="auto-wave-toggle" />
+                  <span class="slider round"></span>
+                </label>
+                <span class="auto-wave-label">AUTO-WAVE</span>
+              </div>
+            </div>
           </div>
         </header>
 
@@ -67,18 +135,18 @@
           <div id="map-container"></div>
 
           <div class="controls" id="tower-controls">
-            <!-- Tower buttons will be injected here or statically defined -->
+            <div class="sidebar-header">DEFENSE UNITS</div>
             <button class="tower-btn" id="btn-tower-basic">
-              <span class="tower-name">Basic</span>
+              <span class="tower-name">Standard</span>
               <span class="tower-cost">$100</span>
             </button>
-            <button class="tower-btn" id="btn-tower-sniper">
-              <span class="tower-name">Sniper</span>
-              <span class="tower-cost">$300</span>
-            </button>
             <button class="tower-btn" id="btn-tower-rapid">
-              <span class="tower-name">Rapid</span>
+              <span class="tower-name">Rapid Fire</span>
               <span class="tower-cost">$150</span>
+            </button>
+            <button class="tower-btn" id="btn-tower-sniper">
+              <span class="tower-name">Sniper MK1</span>
+              <span class="tower-cost">$300</span>
             </button>
           </div>
         </div>
