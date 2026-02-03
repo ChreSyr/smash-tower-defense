@@ -121,7 +121,7 @@ export default class UI {
   updateTowerAvailability(money: number) {
     this.toggleTowerAbility(this.btnTowerBasic, money, 100);
     this.toggleTowerAbility(this.btnTowerSniper, money, 300);
-    this.toggleTowerAbility(this.btnTowerRapid, money, 250);
+    this.toggleTowerAbility(this.btnTowerRapid, money, 150); // Updated from 250
   }
 
   private toggleTowerAbility(btn: HTMLElement, money: number, cost: number) {

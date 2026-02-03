@@ -127,23 +127,19 @@ const map = [
 const waves = [
   // Wave 1: Intro
   // Total Health: 800 | Avg Speed: 2 | Difficulty: ~800
-  { count: 8, interval: 1500, type: E.BASIC },
-
-  // Wave 2: Ramp up
-  // Total Health: 1500 | Avg Speed: 2 | Difficulty: ~1500
-  { count: 15, interval: 1000, type: E.BASIC },
+  { count: 3, interval: 2000, type: E.BASIC },
 
   // Wave 3: Speed test
   // Total Health: 1250 | Avg Speed: 4 | Difficulty: ~2000 (Adjusted for speed)
-  { count: 25, interval: 800, type: E.FAST },
+  { count: 2, interval: 1000, type: E.FAST },
 
   // Wave 4: Tank test
   // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
-  { count: 10, interval: 2000, type: E.HEAVY },
+  { count: 1, interval: 2000, type: E.HEAVY },
 
-  // Wave 5: Swarm
-  // Total Health: 2000 (100 * 20) | Avg Speed: 5 | Difficulty: ~3000
-  { count: 100, interval: 300, type: E.SWARM },
+  // Wave 4: Tank test
+  // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
+  { count: 10, interval: 100, type: E.SWARM },
 
   // Wave 6: BOSS
   // Total Health: 5000 | Speed: 0.5 | Difficulty: ~5000
@@ -170,7 +166,7 @@ const data: LevelData = {
   map,
   waves,
   startHealth: 10,
-  startMoney: 500, // Enough for a few towers
+  startMoney: 250, // Enough for a few towers
 };
 
 export default data;
