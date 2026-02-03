@@ -4,6 +4,7 @@ import Tower from "./Tower";
 import GameMap from "./Map";
 import Level1 from "./levels/level1";
 import Level2 from "./levels/level2";
+import Level3 from "./levels/level3";
 import Enemy from "./Enemy";
 import { LevelData, PathNode, EnemyType, TowerType, Particle } from "./types";
 import { TOWER_CONFIG } from "./constants";
@@ -69,6 +70,7 @@ export default class Game {
   init() {
     this.ui.onPlayLevel1(() => this.startGame(Level1, "Level 1"));
     this.ui.onPlayLevel2(() => this.startGame(Level2, "Level 2"));
+    this.ui.onPlayLevel3(() => this.startGame(Level3, "Level 3"));
     this.ui.onHome(() => this.goHome());
     this.ui.onRestart(() => this.restartLevel());
 
@@ -431,7 +433,10 @@ export default class Game {
     if (this.waveManager.isLastWave()) {
       console.log("VICTORY");
       this.isPlaying = false;
-      this.ui.showVictoryScreen(() => this.goHome());
+      this.ui.showVictoryScreen(
+        () => this.goHome(),
+        () => this.restartLevel(),
+      );
     } else {
       this.ui.toggleWaveButton(true);
     }
@@ -449,7 +454,10 @@ export default class Game {
       this.isPlaying = false;
       this.ui.toggleWaveButton(false);
 
-      this.ui.showGameOverScreen(() => this.goHome());
+      this.ui.showGameOverScreen(
+        () => this.goHome(),
+        () => this.restartLevel(),
+      );
     }
   }
 

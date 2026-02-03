@@ -4,6 +4,7 @@ export default class UI {
 
   playBtn1: HTMLElement;
   playBtn2: HTMLElement | null;
+  playBtn3: HTMLElement | null;
   homeBtn: HTMLElement | null;
   restartBtn: HTMLElement | null;
 
@@ -26,6 +27,7 @@ export default class UI {
 
     this.playBtn1 = document.getElementById("play-btn-1")!;
     this.playBtn2 = document.getElementById("play-btn-2");
+    this.playBtn3 = document.getElementById("play-btn-3");
     this.homeBtn = document.getElementById("home-btn");
     this.restartBtn = document.getElementById("restart-btn");
 
@@ -95,6 +97,10 @@ export default class UI {
     if (this.playBtn2) this.playBtn2.addEventListener("click", callback);
   }
 
+  onPlayLevel3(callback: () => void) {
+    if (this.playBtn3) this.playBtn3.addEventListener("click", callback);
+  }
+
   onHome(callback: () => void) {
     if (this.homeBtn) this.homeBtn.addEventListener("click", callback);
   }
@@ -161,17 +167,24 @@ export default class UI {
     document.getElementById(`speed-${speed}x`)!.style.background = "#2ecc71";
   }
 
-  showGameOverScreen(onHome: () => void) {
+  showGameOverScreen(onHome: () => void, onRestart: () => void) {
     this.createOverlay(
       "Game Over",
       "The enemies have invaded!",
       "base",
       onHome,
+      onRestart,
     );
   }
 
-  showVictoryScreen(onHome: () => void) {
-    this.createOverlay("Victory!", "All enemies defeated!", "victory", onHome);
+  showVictoryScreen(onHome: () => void, onRestart: () => void) {
+    this.createOverlay(
+      "Victory!",
+      "All enemies defeated!",
+      "victory",
+      onHome,
+      onRestart,
+    );
   }
 
   private createOverlay(
@@ -179,6 +192,7 @@ export default class UI {
     msgText: string,
     type: string,
     onHome: () => void,
+    onRestart: () => void,
   ) {
     const container = document.getElementById("game-area");
     if (!container) return;
@@ -193,19 +207,37 @@ export default class UI {
     const msg = document.createElement("p");
     msg.textContent = msgText;
 
-    const btn = document.createElement("button");
-    btn.className = "btn secondary-btn";
-    btn.textContent = "Back to Home";
-    btn.style.fontSize = "1.2rem";
-    btn.style.padding = "10px 30px";
-    btn.addEventListener("click", () => {
+    const buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex";
+    buttonContainer.style.gap = "20px";
+    buttonContainer.style.marginTop = "20px";
+
+    const restartBtn = document.createElement("button");
+    restartBtn.className = "btn primary-btn";
+    restartBtn.textContent = "Restart Level";
+    restartBtn.style.fontSize = "1.2rem";
+    restartBtn.style.padding = "10px 30px";
+    restartBtn.addEventListener("click", () => {
+      overlay.remove();
+      onRestart();
+    });
+
+    const homeBtn = document.createElement("button");
+    homeBtn.className = "btn secondary-btn";
+    homeBtn.textContent = "Back to Home";
+    homeBtn.style.fontSize = "1.2rem";
+    homeBtn.style.padding = "10px 30px";
+    homeBtn.addEventListener("click", () => {
       overlay.remove();
       onHome();
     });
 
+    buttonContainer.appendChild(restartBtn);
+    buttonContainer.appendChild(homeBtn);
+
     overlay.appendChild(title);
     overlay.appendChild(msg);
-    overlay.appendChild(btn);
+    overlay.appendChild(buttonContainer);
 
     container.appendChild(overlay);
   }
