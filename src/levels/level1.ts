@@ -125,25 +125,25 @@ const map = [
 ];
 
 const waves = [
-  // Total Health: 800 | Avg Speed: 2 | Difficulty: ~800
+  // Total Health: 180 | Speed: 2 | Difficulty: ~180
   { count: 3, interval: 2000, type: E.BASIC },
 
-  // Total Health: 1250 | Avg Speed: 4 | Difficulty: ~2000 (Adjusted for speed)
+  // Total Health: 100 | Speed: 5 | Difficulty: ~250
   { count: 2, interval: 1000, type: E.FAST },
 
-  // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
+  // Total Health: 250 | Speed: 1 | Difficulty: ~125
   { count: 1, interval: 2000, type: E.HEAVY },
 
-  // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
+  // Total Health: 260 | Speed: 7 | Difficulty: ~910
   { count: 10, interval: 100, type: E.SWARM },
 
-  // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
+  // Total Health: 540 | Speed: 2 | Difficulty: ~540
   { count: 9, interval: 500, type: E.BASIC },
 
-  // Total Health: 2500 | Avg Speed: 1 | Difficulty: ~2500
+  // Total Health: 1000 | Speed: 1 | Difficulty: ~500
   { count: 4, interval: 2000, type: E.HEAVY },
 
-  // Total Health: 5000 | Speed: 0.5 | Difficulty: ~5000
+  // Total Health: 5000 | Speed: 0.5 | Difficulty: ~1250
   { count: 1, interval: 3000, type: E.BOSS },
 ];
 

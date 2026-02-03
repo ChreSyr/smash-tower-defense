@@ -10,15 +10,15 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
   [E.BASIC]: {
     speed: 2,
     health: 60,
-    color: "#e91e63", // Pink/Magenta (was red)
+    color: "#da517eff",
     radius: 0.3,
     damage: 1,
     killValue: 10,
   },
   [E.FAST]: {
-    speed: 4,
+    speed: 5,
     health: 50,
-    color: "#ff9800", // Bright Orange (was orange)
+    color: "#ff9800",
     radius: 0.25,
     damage: 1,
     killValue: 20,
@@ -29,43 +29,46 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#8e44ad",
     radius: 0.4,
     damage: 3,
-    killValue: 50,
-  },
-  [E.BOSS]: {
-    speed: 0.5,
-    health: 5000, // 50x Basic
-    color: "#2c3e50",
-    radius: 0.45,
-    damage: 10,
-    killValue: 1000,
+    killValue: 50, // highest value
   },
   [E.SWARM]: {
-    speed: 5,
-    health: 25,
+    speed: 7,
+    health: 26, // Not 1-shot by BASIC
     color: "#16a085",
     radius: 0.2,
     damage: 1,
-    killValue: 8, // Increased from 5
+    killValue: 8,
+  },
+  [E.BOSS]: {
+    speed: 0.5,
+    health: 5000,
+    color: "#2c3e50",
+    radius: 0.45,
+    damage: 10,
+    killValue: 10, // mdr
   },
 };
 
 export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
+  // Good dps, good fire rate, good range
   [T.BASIC]: {
     name: "Basic",
     cost: 100,
     range: 3.5,
-    damage: 20,
-    fireRate: 1,
+    damage: 25,
+    fireRate: 2,
     color: "#2980b9",
   },
+  // Excellent dps, bad fire rate, excellent range
   [T.SNIPER]: {
     name: "Sniper",
     cost: 300,
     range: 8,
     damage: 100,
-    fireRate: 0.4,
+    fireRate: 1,
     color: "#c0392b",
   },
+  // Good dps, excellent fire rate, bad range
   [T.RAPID]: {
     name: "Rapid",
     cost: 150,
