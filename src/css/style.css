@@ -289,6 +289,13 @@ section {
   animation: fadeIn 0.5s ease-out;
 }
 
+#game-over-overlay.victory {
+  background: rgba(0, 50, 0, 0.85); /* Green tint */
+}
+#game-over-overlay.victory h2 {
+  color: #2ecc71;
+}
+
 #game-over-overlay h2 {
   font-size: 3rem;
   color: #e74c3c;

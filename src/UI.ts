@@ -156,21 +156,42 @@ export default class UI {
   }
 
   showGameOverScreen(onHome: () => void) {
+    this.createOverlay(
+      "Game Over",
+      "The enemies have invaded!",
+      "base",
+      onHome,
+    );
+  }
+
+  showVictoryScreen(onHome: () => void) {
+    this.createOverlay("Victory!", "All enemies defeated!", "victory", onHome);
+  }
+
+  private createOverlay(
+    titleText: string,
+    msgText: string,
+    type: string,
+    onHome: () => void,
+  ) {
     const container = document.getElementById("game-area");
     if (!container) return;
 
     const overlay = document.createElement("div");
     overlay.id = "game-over-overlay";
+    if (type === "victory") overlay.classList.add("victory");
 
     const title = document.createElement("h2");
-    title.textContent = "Game Over";
+    title.textContent = titleText;
 
     const msg = document.createElement("p");
-    msg.textContent = "The enemies have invaded!";
+    msg.textContent = msgText;
 
     const btn = document.createElement("button");
     btn.className = "btn secondary-btn";
     btn.textContent = "Back to Home";
+    btn.style.fontSize = "1.2rem";
+    btn.style.padding = "10px 30px";
     btn.addEventListener("click", () => {
       overlay.remove();
       onHome();

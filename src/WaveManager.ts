@@ -72,4 +72,8 @@ export default class WaveManager {
   isSpawning(): boolean {
     return this.spawnQueue.length > 0;
   }
+
+  isLastWave(): boolean {
+    return this.currentWaveIndex >= this.waves.length - 1;
+  }
 }

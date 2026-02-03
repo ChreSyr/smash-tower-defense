@@ -386,7 +386,14 @@ export default class Game {
       this.ui.updateTowerAvailability(this.money);
     }
 
-    this.ui.toggleWaveButton(true);
+    // Check for Victory
+    if (this.waveManager.isLastWave()) {
+      console.log("VICTORY");
+      this.isPlaying = false;
+      this.ui.showVictoryScreen(() => this.goHome());
+    } else {
+      this.ui.toggleWaveButton(true);
+    }
   }
 
   takeDamage(amount: number) {
