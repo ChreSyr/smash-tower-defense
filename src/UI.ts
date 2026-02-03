@@ -5,6 +5,7 @@ export default class UI {
   playBtn1: HTMLElement;
   playBtn2: HTMLElement | null;
   homeBtn: HTMLElement | null;
+  restartBtn: HTMLElement | null;
 
   startWaveBtn: HTMLButtonElement;
 
@@ -26,6 +27,7 @@ export default class UI {
     this.playBtn1 = document.getElementById("play-btn-1")!;
     this.playBtn2 = document.getElementById("play-btn-2");
     this.homeBtn = document.getElementById("home-btn");
+    this.restartBtn = document.getElementById("restart-btn");
 
     this.startWaveBtn = document.getElementById(
       "start-wave-btn",
@@ -99,6 +101,10 @@ export default class UI {
 
   onStartWave(callback: () => void) {
     this.startWaveBtn.addEventListener("click", callback);
+  }
+
+  onRestart(callback: () => void) {
+    if (this.restartBtn) this.restartBtn.addEventListener("click", callback);
   }
 
   onTowerSelect(callback: (type: string) => void) {

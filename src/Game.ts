@@ -34,6 +34,10 @@ export default class Game {
   hoverTileRow: number = -1;
   hoverTileCol: number = -1;
 
+  // Current level tracking for restart
+  currentLevelData: LevelData | null = null;
+  currentLevelTitle: string = "";
+
   constructor() {
     this.ui = new UI();
     this.waveManager = new WaveManager(this);
@@ -66,6 +70,7 @@ export default class Game {
     this.ui.onPlayLevel1(() => this.startGame(Level1, "Level 1"));
     this.ui.onPlayLevel2(() => this.startGame(Level2, "Level 2"));
     this.ui.onHome(() => this.goHome());
+    this.ui.onRestart(() => this.restartLevel());
 
     this.ui.onStartWave(() => this.startWave());
 
@@ -84,6 +89,10 @@ export default class Game {
 
   startGame(levelData: LevelData, title: string) {
     console.log(`Starting ${title}`);
+
+    // Store level data for restart
+    this.currentLevelData = levelData;
+    this.currentLevelTitle = title;
 
     this.playerHealth = levelData.startHealth || 10;
     this.money = levelData.startMoney || 100;
@@ -267,6 +276,13 @@ export default class Game {
 
     container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
+  }
+
+  restartLevel() {
+    if (this.currentLevelData && this.currentLevelTitle) {
+      console.log(`Restarting ${this.currentLevelTitle}`);
+      this.startGame(this.currentLevelData, this.currentLevelTitle);
+    }
   }
 
   goHome() {
