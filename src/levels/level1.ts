@@ -125,9 +125,12 @@ const map = [
 ];
 
 const waves = [
-  { count: 5, interval: 1500, type: E.BASIC },
-  { count: 5, interval: 1000, type: E.FAST },
-  { count: 3, interval: 2000, type: E.HEAVY },
+  { count: 8, interval: 1500, type: E.BASIC }, // ~80 money + 20 bonus = 100
+  { count: 10, interval: 1000, type: E.BASIC }, // ~100 money + 25 bonus = 125
+  { count: 6, interval: 1200, type: E.FAST }, // ~60 money (higher kill val?) + bonus
+  { count: 5, interval: 2000, type: E.HEAVY },
+  { count: 12, interval: 800, type: E.FAST },
+  { count: 1, interval: 3000, type: E.BOSS }, // Boss wave
 ];
 
 const data: LevelData = {

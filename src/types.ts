@@ -39,6 +39,17 @@ export interface TowerConfig {
   color: string;
 }
 
+export interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  maxLife: number;
+  color: string;
+  size: number;
+}
+
 export interface WaveConfig {
   count: number;
   interval: number;

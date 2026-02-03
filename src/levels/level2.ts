@@ -125,8 +125,12 @@ const map = [
 ];
 
 const waves = [
-  { count: 20, interval: 300, type: E.SWARM },
-  { count: 1, interval: 2000, type: E.BOSS },
+  { count: 15, interval: 500, type: E.SWARM }, // Easy start
+  { count: 10, interval: 1200, type: E.BASIC },
+  { count: 8, interval: 1000, type: E.FAST },
+  { count: 25, interval: 400, type: E.SWARM },
+  { count: 6, interval: 2000, type: E.HEAVY },
+  { count: 2, interval: 4000, type: E.BOSS },
 ];
 
 const data: LevelData = {

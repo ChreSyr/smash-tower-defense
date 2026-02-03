@@ -77,4 +77,11 @@ export default class Enemy {
       this.y += (dy / distance) * moveStep;
     }
   }
+  takeDamage(amount: number) {
+    this.health -= amount;
+    if (this.health <= 0) {
+      this.health = 0;
+      this.alive = false;
+    }
+  }
 }

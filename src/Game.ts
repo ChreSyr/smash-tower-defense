@@ -5,7 +5,7 @@ import GameMap from "./Map";
 import Level1 from "./levels/level1";
 import Level2 from "./levels/level2";
 import Enemy from "./Enemy";
-import { LevelData, PathNode, EnemyType, TowerType } from "./types";
+import { LevelData, PathNode, EnemyType, TowerType, Particle } from "./types";
 import { TOWER_CONFIG } from "./constants";
 
 export default class Game {
@@ -15,6 +15,7 @@ export default class Game {
   map: GameMap | null;
 
   enemies: Enemy[];
+  particles: Particle[];
   currentPath: PathNode[];
   playerHealth: number;
   money: number;
@@ -23,17 +24,23 @@ export default class Game {
 
   lastTime: number;
   isPlaying: boolean;
-
+  speedMultiplier: number;
   canvas: HTMLCanvasElement | null;
   ctx: CanvasRenderingContext2D | null;
+
+  // State
+  selectedTowerType: TowerType | null = null;
+  towers: Tower[] = [];
 
   constructor() {
     this.ui = new UI();
     this.waveManager = new WaveManager(this);
-    this.tower = new Tower();
+    this.tower = new Tower(TowerType.BASIC, 0, 0); // Placeholder
     this.map = null;
 
     this.enemies = [];
+    this.particles = [];
+    this.towers = [];
     this.currentPath = [];
     this.playerHealth = 10;
     this.money = 0;
@@ -46,6 +53,8 @@ export default class Game {
     this.canvas = null;
     this.ctx = null;
 
+    this.speedMultiplier = 1;
+
     this.gameLoop = this.gameLoop.bind(this);
 
     this.init();
@@ -57,6 +66,11 @@ export default class Game {
     this.ui.onHome(() => this.goHome());
 
     this.ui.onStartWave(() => this.startWave());
+
+    this.ui.onSpeedChange((speed) => {
+      this.speedMultiplier = speed;
+      console.log(`Speed set to ${speed}x`);
+    });
 
     // Handle Tower Selection
     this.ui.onTowerSelect((type: string) => {
@@ -73,10 +87,15 @@ export default class Game {
     this.money = levelData.startMoney || 100;
     this.ui.updateHealth(this.playerHealth);
     this.ui.updateMoney(this.money);
+    this.ui.updateTowerAvailability(this.money);
 
     this.waveInProgress = false;
     this.waveEnemiesKilledValue = 0;
     this.ui.toggleWaveButton(true);
+
+    this.towers = [];
+    this.selectedTowerType = null;
+    this.ui.highlightTower(null); // Clear selection UI
 
     this.map = new GameMap(levelData.map);
     this.currentPath = this.map.findPath();
@@ -98,6 +117,7 @@ export default class Game {
 
       // Setup Canvas INSIDE the grid (so it overlays perfectly)
       this.setupCanvas(gridElement);
+      this.setupMapInteraction(gridElement);
 
       // Setup Resizing Logic
       this.handleResize(mapContainer, gridElement, this.canvas!);
@@ -109,6 +129,68 @@ export default class Game {
     }
 
     this.ui.updateWaveStatus(0, levelData.waves.length);
+  }
+
+  setupMapInteraction(gridElement: HTMLElement) {
+    gridElement.addEventListener("click", (e) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains("tile")) {
+        const row = parseInt(target.dataset.row || "-1");
+        const col = parseInt(target.dataset.col || "-1");
+        if (row >= 0 && col >= 0) {
+          this.handleTileClick(row, col);
+        }
+      }
+    });
+  }
+
+  handleTileClick(row: number, col: number) {
+    if (!this.selectedTowerType) return;
+    if (!this.map) return;
+
+    const tileType = this.map.grid[row][col];
+
+    // 1. Check if buildable
+    if (tileType !== 1) {
+      // 1 is BUILDABLE in enum, waiting for proper import usage or check types.ts
+      // Actually let's use the enum if we can, or just assume logic for now.
+      // tileType from map.grid is number (enum).
+      // Enum: EMPTY=0, BUILDABLE=1
+      console.log("Not a buildable tile");
+      return;
+    }
+
+    // 2. Check if occupied
+    const occupied = this.towers.find((t) => t.y === row && t.x === col);
+    if (occupied) {
+      console.log("Tile occupied");
+      return;
+    }
+
+    // 3. Check cost
+    const config = TOWER_CONFIG[this.selectedTowerType];
+    if (this.money < config.cost) {
+      console.log("Not enough money");
+      return;
+    }
+
+    // Place Tower
+    this.placeTower(this.selectedTowerType, col, row, config.cost);
+  }
+
+  placeTower(type: TowerType, x: number, y: number, cost: number) {
+    this.money -= cost;
+    this.ui.updateMoney(this.money);
+    this.ui.updateTowerAvailability(this.money);
+
+    const newTower = new Tower(type, x, y);
+    this.towers.push(newTower);
+
+    console.log(`Placed ${type} tower at ${x},${y}`);
+
+    // Deselect logic? Optional. Let's keep selected for multi-build?
+    // User requirement specifically said "Select a tower then click", didn't specify auto-deselect.
+    // Usually keeping it selected is nicer.
   }
 
   handleResize(
@@ -149,6 +231,7 @@ export default class Game {
   goHome() {
     this.isPlaying = false;
     this.enemies = [];
+    this.towers = [];
     this.ui.showHomeScreen();
   }
 
@@ -169,17 +252,18 @@ export default class Game {
   }
 
   handleTowerSelect(typeStr: string) {
-    // Just logic stub for now
     let type = TowerType.BASIC;
     if (typeStr === "sniper") type = TowerType.SNIPER;
     if (typeStr === "rapid") type = TowerType.RAPID;
 
+    // Check affordability immediately for feedback?
+    // Or just set state.
+    this.selectedTowerType = type;
+    this.ui.highlightTower(typeStr);
+
     const config = TOWER_CONFIG[type];
-    if (this.money >= config.cost) {
-      console.log(`Selected ${config.name} tower. Cost: ${config.cost}`);
-      // In future: set placement mode
-    } else {
-      console.log("Not enough money!");
+    if (this.money < config.cost) {
+      console.log("Warning: Can't afford yet");
     }
   }
 
@@ -190,7 +274,8 @@ export default class Game {
   }
 
   gameLoop(timestamp: number) {
-    const deltaTime = (timestamp - this.lastTime) / 1000;
+    const deltaTime =
+      ((timestamp - this.lastTime) / 1000) * this.speedMultiplier;
     this.lastTime = timestamp;
 
     if (this.isPlaying) {
@@ -206,6 +291,10 @@ export default class Game {
 
     this.waveManager.update(deltaTime);
 
+    // Update Towers
+    this.towers.forEach((tower) => tower.update(deltaTime, this.enemies));
+
+    // Filter dead enemies
     for (let i = this.enemies.length - 1; i >= 0; i--) {
       const enemy = this.enemies[i];
       enemy.update(deltaTime);
@@ -228,6 +317,15 @@ export default class Game {
         this.endWave();
       }
     }
+
+    // Update Particles
+    this.particles.forEach((p) => {
+      p.life -= deltaTime;
+      p.x += p.vx * deltaTime;
+      p.y += p.vy * deltaTime;
+    });
+
+    this.particles = this.particles.filter((p) => p.life > 0);
   }
 
   handleEnemyKill(enemy: Enemy) {
@@ -235,6 +333,27 @@ export default class Game {
     this.money += value;
     this.waveEnemiesKilledValue += value;
     this.ui.updateMoney(this.money);
+    this.ui.updateTowerAvailability(this.money);
+
+    this.spawnDeathParticles(enemy);
+  }
+
+  spawnDeathParticles(enemy: Enemy) {
+    const count = 8;
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 2 + 1; // Speed in tiles/sec
+      this.particles.push({
+        x: enemy.x,
+        y: enemy.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 0.5, // 0.5 seconds
+        maxLife: 0.5,
+        color: enemy.color,
+        size: Math.random() * 0.1 + 0.05,
+      });
+    }
   }
 
   endWave() {
@@ -247,6 +366,7 @@ export default class Game {
       console.log(`Wave Bonus: ${bonus}`);
       this.money += bonus;
       this.ui.updateMoney(this.money);
+      this.ui.updateTowerAvailability(this.money);
     }
 
     this.ui.toggleWaveButton(true);
@@ -263,6 +383,8 @@ export default class Game {
       this.ui.updateHealth("GAME OVER");
       this.isPlaying = false;
       this.ui.toggleWaveButton(false);
+
+      this.ui.showGameOverScreen(() => this.goHome());
     }
   }
 
@@ -273,6 +395,65 @@ export default class Game {
 
     const tileSize = this.canvas.width / this.map.cols;
 
+    // Render Towers
+    this.towers.forEach((tower) => {
+      if (!this.ctx) return;
+      const center = tower.getCenter(tileSize);
+
+      this.ctx.beginPath();
+      this.ctx.fillStyle = tower.config.color;
+      // Draw square or circle for tower? Let's do a square with border
+      const size = tileSize * 0.8;
+      this.ctx.fillRect(center.x - size / 2, center.y - size / 2, size, size);
+
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeStyle = "#333";
+      this.ctx.strokeRect(center.x - size / 2, center.y - size / 2, size, size);
+
+      // Helper range ring (optional, maybe only when selected or hovered?)
+      // this.ctx.beginPath();
+      // this.ctx.arc(center.x, center.y, tower.config.range * tileSize, 0, Math.PI*2);
+      // this.ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+      // this.ctx.stroke();
+
+      // Draw Laser
+      if (tower.target && tower.laserOpacity > 0) {
+        const targetX = tower.target.x * tileSize;
+        const targetY = tower.target.y * tileSize;
+
+        // Laser Color based on tower type
+        let color = "52, 152, 219"; // Blue default
+        let width = 4;
+
+        if (tower.type === TowerType.SNIPER) {
+          color = "231, 76, 60"; // Red
+          width = 6;
+        } else if (tower.type === TowerType.RAPID) {
+          color = "241, 196, 15"; // Yellow
+          width = 3;
+        }
+
+        // Draw Glow (Outer line)
+        this.ctx.beginPath();
+        this.ctx.moveTo(center.x, center.y);
+        this.ctx.lineTo(targetX, targetY);
+        this.ctx.lineWidth = width * 3; // 3x width for glow
+        this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity * 0.3})`;
+        this.ctx.lineCap = "round";
+        this.ctx.stroke();
+
+        // Draw Core (Inner line)
+        this.ctx.beginPath();
+        this.ctx.moveTo(center.x, center.y);
+        this.ctx.lineTo(targetX, targetY);
+        this.ctx.lineWidth = width;
+        this.ctx.strokeStyle = `rgba(${color}, ${tower.laserOpacity})`;
+        this.ctx.lineCap = "round";
+        this.ctx.stroke();
+      }
+    });
+
+    // Render Enemies
     this.enemies.forEach((enemy) => {
       if (!this.ctx) return;
       const cx = enemy.x * tileSize;
@@ -286,6 +467,20 @@ export default class Game {
       this.ctx.lineWidth = 2;
       this.ctx.strokeStyle = "#ffffff";
       this.ctx.stroke();
+    });
+
+    // Render Particles
+    this.particles.forEach((p) => {
+      if (!this.ctx) return;
+      this.ctx.beginPath();
+      this.ctx.globalAlpha = p.life / p.maxLife;
+      this.ctx.fillStyle = p.color;
+      const px = p.x * tileSize;
+      const py = p.y * tileSize;
+      const size = p.size * (p.life / p.maxLife) * tileSize;
+      this.ctx.arc(px, py, size, 0, Math.PI * 2);
+      this.ctx.fill();
+      this.ctx.globalAlpha = 1.0;
     });
   }
 }

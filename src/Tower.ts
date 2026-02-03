@@ -1,10 +1,94 @@
+import { TowerType, TowerConfig } from "./types";
+import { TOWER_CONFIG } from "./constants";
+import Enemy from "./Enemy";
+
 export default class Tower {
-  constructor() {
-    // Tower properties will go here
+  x: number;
+  y: number; // Grid coordinates
+  type: TowerType;
+  config: TowerConfig;
+
+  // Cooldown management
+  lastShotTime: number;
+  cooldown: number; // in seconds
+
+  // Visuals
+  target: Enemy | null = null; // Current target for laser
+  laserOpacity: number = 0; // For fading laser effect
+
+  constructor(type: TowerType, x: number, y: number) {
+    this.type = type;
+    this.x = x;
+    this.y = y;
+    this.config = TOWER_CONFIG[type];
+
+    this.lastShotTime = 0;
+    this.cooldown = 1 / this.config.fireRate;
   }
 
-  create() {
-    console.log("Tower created!");
-    // Logic to place tower on map will go here
+  update(deltaTime: number, enemies: Enemy[]) {
+    // 1. Cooldown
+    if (this.lastShotTime > 0) {
+      this.lastShotTime -= deltaTime;
+    }
+
+    // Decay laser visual if any
+    if (this.laserOpacity > 0) {
+      this.laserOpacity -= deltaTime * 5; // Fade out speed
+      if (this.laserOpacity < 0) this.laserOpacity = 0;
+    }
+
+    // 2. Find Target if ready
+    if (this.lastShotTime <= 0) {
+      const target = this.findTarget(enemies);
+      if (target) {
+        this.shoot(target);
+      }
+    }
+  }
+
+  findTarget(enemies: Enemy[]): Enemy | null {
+    // Simple logic: Find closest in range
+    let closest: Enemy | null = null;
+    let minDist = Infinity;
+
+    // Range is in grid units. Config.range e.g. 3.
+    const rangeSq = this.config.range * this.config.range;
+
+    for (const enemy of enemies) {
+      if (!enemy.alive) continue;
+
+      // Enemy x,y are grid coordinates (float usually)
+      const dx = enemy.x - (this.x + 0.5); // Center to Center
+      const dy = enemy.y - (this.y + 0.5);
+
+      const distSq = dx * dx + dy * dy;
+
+      if (distSq <= rangeSq) {
+        if (distSq < minDist) {
+          minDist = distSq;
+          closest = enemy;
+        }
+      }
+    }
+
+    return closest;
+  }
+
+  shoot(enemy: Enemy) {
+    enemy.takeDamage(this.config.damage);
+    this.lastShotTime = this.cooldown;
+
+    // Visual
+    this.target = enemy;
+    this.laserOpacity = 1;
+  }
+
+  // Helper to get render position
+  getCenter(tileSize: number) {
+    return {
+      x: (this.x + 0.5) * tileSize,
+      y: (this.y + 0.5) * tileSize,
+    };
   }
 }

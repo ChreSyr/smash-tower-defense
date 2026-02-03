@@ -175,6 +175,13 @@ section {
   padding: 10px 20px;
   height: auto;
 }
+.tower-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #eee;
+  pointer-events: none; /* Prevent click logic if we want, or just rely on transparency */
+  border-color: #ddd;
+}
 .tower-btn span {
   pointer-events: none;
 }
@@ -195,6 +202,45 @@ section {
 }
 .primary-btn:hover {
   background-color: #2980b9;
+}
+
+/* Game Over Overlay */
+#game-over-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  color: white;
+  animation: fadeIn 0.5s ease-out;
+}
+
+#game-over-overlay h2 {
+  font-size: 3rem;
+  color: #e74c3c;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+#game-over-overlay p {
+  font-size: 1.5rem;
+  margin-bottom: 30px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .secondary-btn {

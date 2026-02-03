@@ -103,4 +103,80 @@ export default class UI {
     this.btnTowerSniper.addEventListener("click", () => callback("sniper"));
     this.btnTowerRapid.addEventListener("click", () => callback("rapid"));
   }
+
+  highlightTower(type: string | null) {
+    // Reset all
+    this.btnTowerBasic.classList.remove("selected");
+    this.btnTowerSniper.classList.remove("selected");
+    this.btnTowerRapid.classList.remove("selected");
+
+    if (type === "basic") this.btnTowerBasic.classList.add("selected");
+    if (type === "sniper") this.btnTowerSniper.classList.add("selected");
+    if (type === "rapid") this.btnTowerRapid.classList.add("selected");
+  }
+
+  updateTowerAvailability(money: number) {
+    this.toggleTowerAbility(this.btnTowerBasic, money, 100);
+    this.toggleTowerAbility(this.btnTowerSniper, money, 300);
+    this.toggleTowerAbility(this.btnTowerRapid, money, 250);
+  }
+
+  private toggleTowerAbility(btn: HTMLElement, money: number, cost: number) {
+    if (money >= cost) {
+      btn.classList.remove("disabled");
+    } else {
+      btn.classList.add("disabled");
+    }
+  }
+  onSpeedChange(callback: (speed: number) => void) {
+    document.getElementById("speed-1x")?.addEventListener("click", () => {
+      this.highlightSpeed(1);
+      callback(1);
+    });
+    document.getElementById("speed-2x")?.addEventListener("click", () => {
+      this.highlightSpeed(2);
+      callback(2);
+    });
+    document.getElementById("speed-4x")?.addEventListener("click", () => {
+      this.highlightSpeed(4);
+      callback(4);
+    });
+
+    this.highlightSpeed(1); // Default
+  }
+
+  highlightSpeed(speed: number) {
+    document
+      .querySelectorAll("#speed-controls .btn")
+      .forEach((btn) => ((btn as HTMLElement).style.background = ""));
+    document.getElementById(`speed-${speed}x`)!.style.background = "#2ecc71";
+  }
+
+  showGameOverScreen(onHome: () => void) {
+    const container = document.getElementById("game-area");
+    if (!container) return;
+
+    const overlay = document.createElement("div");
+    overlay.id = "game-over-overlay";
+
+    const title = document.createElement("h2");
+    title.textContent = "Game Over";
+
+    const msg = document.createElement("p");
+    msg.textContent = "The enemies have invaded!";
+
+    const btn = document.createElement("button");
+    btn.className = "btn secondary-btn";
+    btn.textContent = "Back to Home";
+    btn.addEventListener("click", () => {
+      overlay.remove();
+      onHome();
+    });
+
+    overlay.appendChild(title);
+    overlay.appendChild(msg);
+    overlay.appendChild(btn);
+
+    container.appendChild(overlay);
+  }
 }

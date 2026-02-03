@@ -13,7 +13,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#e74c3c",
     radius: 0.3,
     damage: 1,
-    killValue: 10,
+    killValue: 15, // Increased from 10
   },
   [E.FAST]: {
     speed: 4,
@@ -21,15 +21,15 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#f39c12",
     radius: 0.25,
     damage: 1,
-    killValue: 15,
+    killValue: 20, // Increased from 15
   },
   [E.HEAVY]: {
     speed: 1,
-    health: 300,
+    health: 250, // Decreased from 300
     color: "#8e44ad",
     radius: 0.4,
     damage: 3,
-    killValue: 30,
+    killValue: 50, // Increased from 30
   },
   [E.BOSS]: {
     speed: 0.5,
@@ -37,7 +37,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#2c3e50",
     radius: 0.45,
     damage: 10,
-    killValue: 200,
+    killValue: 300, // Increased from 200
   },
   [E.SWARM]: {
     speed: 5,
@@ -45,7 +45,7 @@ export const ENEMY_CONFIG: Record<EnemyType, EnemyConfig> = {
     color: "#16a085",
     radius: 0.2,
     damage: 1,
-    killValue: 5,
+    killValue: 8, // Increased from 5
   },
 };
 
@@ -53,25 +53,25 @@ export const TOWER_CONFIG: Record<TowerType, TowerConfig> = {
   [T.BASIC]: {
     name: "Basic",
     cost: 100,
-    range: 3,
-    damage: 10,
+    range: 3.5, // Buffer range
+    damage: 20, // Buffed from 10
     fireRate: 1,
     color: "#3498db",
   },
   [T.SNIPER]: {
     name: "Sniper",
     cost: 300,
-    range: 7,
-    damage: 50,
-    fireRate: 0.3,
+    range: 8, // Buffed from 7
+    damage: 100, // Buffed from 50 (One shot kills basic)
+    fireRate: 0.4, // Buffed from 0.3
     color: "#2ecc71",
   },
   [T.RAPID]: {
     name: "Rapid",
     cost: 250,
-    range: 2,
-    damage: 5,
-    fireRate: 5,
+    range: 2.5,
+    damage: 4,
+    fireRate: 8, // Very fast
     color: "#f1c40f",
   },
 };
